@@ -81,6 +81,8 @@ static const char *PROG_NAME_LOOKUP[] =
    (char *)NULL,
 
 };
+static const char SPEWRC_ENV[] = "SPEWRC";
+static const char DEFAULT_SPEWRC_FILENAME[] = ".spewrc";
 static const char PROG_VERSION[] = VERSION;
 static const int MAX_TMP_STR_LEN = 1024;
 static const unsigned int INDENT_SIZE = 4;
@@ -372,6 +374,70 @@ Units_t get_units(const char *arg)
 }
 
 
+//////////////////////////  read_rcfile()  ///////////////////////////////////
+bool read_rcfile(poptContext &context)
+{
+   string rcFilePath = "";
+   if (getenv(SPEWRC_ENV))
+   {
+      rcFilePath = getenv(SPEWRC_ENV);
+   }
+   else
+   {
+      char *home = getenv("HOME");
+      if (home)
+      {
+         rcFilePath = home;
+         rcFilePath += "/";
+         rcFilePath += DEFAULT_SPEWRC_FILENAME;
+      }
+   }
+   if (rcFilePath.length() == 0)
+      return true;  // No file to process.
+
+   FILE *rcfile = (FILE *)NULL;
+   struct stat statbuf;
+   if (stat(rcFilePath.c_str(), &statbuf) >= 0)
+   {
+      rcfile = fopen(rcFilePath.c_str(), "r");
+      if (rcfile == (FILE *)NULL)
+      {
+         error_msg("Cannot open rc file \"%s\" -- %s.\n", 
+                   rcFilePath.c_str(), strError(errno).c_str());
+         return false;
+      }
+   }
+   else
+   {
+      if (errno == ENOENT)
+         return true; // File does not exist.
+      else
+      {
+         error_msg("Cannot access rc file \"%s\" -- %s.\n", 
+                   rcFilePath.c_str(), strError(errno).c_str());
+         return false;
+      }
+   }
+
+   char rcArgs[MAX_TMP_STR_LEN];
+   int newArgc;
+   const char **newArgv;
+   int len;
+   while (fgets(rcArgs, MAX_TMP_STR_LEN, rcfile) != (char *)NULL)
+   {
+      len = strlen(rcArgs);
+      if (rcArgs[len - 1] == '\n')
+         rcArgs[len - 1] = '\0';
+      if (rcArgs[0] != '\0')
+      {
+         poptParseArgvString(rcArgs, &newArgc, &newArgv);
+         poptStuffArgs(context, newArgv);
+      }
+   }
+
+   return true;
+}
+
 
 //////////////////////////  parse_options()  /////////////////////////////////
 bool parse_options(int argc, const char **argv)
@@ -431,14 +497,31 @@ bool parse_options(int argc, const char **argv)
       {"detailed-statistics", 'v', POPT_ARG_NONE, &detailedStatisticsArg, 0, "Output detailed statistics.", NULL},
       {"write", 0, POPT_ARG_NONE, &writeArg, 0, "Write data to FILE.", NULL},
       {"help", '?', POPT_ARG_NONE, &helpArg, 0, "Show this help and exit.", NULL},
-      { NULL, 0, 0, NULL, 0 }
+      POPT_TABLEEND
    };
 
-   poptContext context = poptGetContext(gPrgName, argc, argv, optionsTable, 0);
+   poptContext context = poptGetContext(gPrgName,
+                                        argc, 
+                                        argv, 
+                                        optionsTable, 
+                                        POPT_CONTEXT_POSIXMEHARDER);
+
+   if (!read_rcfile(context))
+       return false;
+
    int rc = poptGetNextOpt(context);
    if (rc < -1)
    {
-      error_msg("%s\n", poptStrerror(rc));
+      switch (rc)
+      {
+      case POPT_ERROR_BADOPT:
+         error_msg("bad or unknown option \"%s\"\n.", 
+                   poptBadOption(context, 0));
+         break;
+      default:
+         error_msg("%s.\n", poptStrerror(rc));
+         break;
+      }
       usage(context);
       poptFreeContext(context);
       return false;

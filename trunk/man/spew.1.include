@@ -124,4 +124,9 @@ od -A d --format=d8 --width=32  <file>
 .PP
 
 
+[FILES]
+.TP
+\fI$HOME/.spewrc\fR or \fI$SPEWRC\fR
+- holds default options for spew.
+
 
