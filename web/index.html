@@ -1,0 +1,485 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Spew -- an I/O performance measurement and load generation tool</title>
+  </head>
+
+  <body>
+
+    <table style="text-align: left; width: 100%;" border="0" cellpadding="10"
+ cellspacing="2">
+      <tbody>
+	<tr>
+	  <td><div align="center"><img src="images/spew-logo.jpg"
+		width="432" height="120"></div>
+	  </td>
+	</tr>
+
+        <tr>
+	  <td>
+	    <center><h2> An I/O performance measurement and load
+	      generation tool </h2></center>
+	  </td>
+	</tr>
+
+	<tr>
+	  <td>
+	    <ul>
+	      <li><a href="#description">description</a></li>
+	      <li><a href="#features">features</a></li>
+	      <li><a href="#news">news</a></li>
+	      <li><a href="#download">download</a><br>
+	      <li><a href="#src">source archive</a><br>
+	      <li><a href="#screenshots">screenshots</a></li>
+	      <li><a href="#documentation">documentation</a></li>
+	      <li><a href="#license">license</a></li>
+	    </ul>
+	  </td>
+	</tr>
+
+	<tr>
+	  <td>
+	    <a name="description"></a>
+	    <hr style="width: 100%; height: 2px;"><span style="font-weight: bold;">Description</span><br>
+	    <br>
+            Spew is used to measure I/O performance of character
+            devices, block devices, and regular files. It can also be
+            used to generate high I/O loads to stress systems while
+            verifying data integrity.
+	    <p>
+            Spew is easy to use and is flexible.  No configuration
+            files or complicated client/server configurations are
+            needed.  Spew also generates its own data patterns that
+            are designed to make it easy to find and debug data
+            integrity problems.
+	    <p>
+	    <div style="text-align: right;">--&nbsp; <a href="mailto:andrew-spew@fwe.com">Andrew Patterson &lt;andrew-spew@fwe.com&gt;</a><br>
+           </td>
+	</tr>
+
+	<tr>
+	  <td>
+	    <a name="features"></a>
+	    <hr style="width: 100%; height: 2px;"><span style="font-weight: bold;">Features</span><br>
+	    <br>
+	    <ul>
+	      <li>Write, read, or read-after-write operation.
+	      <li>Random or sequential access.
+	      <li>Regular, synchronous, or direct-IO.
+	      <li>Data integrity verified using various data patterns.
+	      <li>Low system-call overhead.
+	      <li>Generates write data in various patterns, no need to pipe data in from another source.
+	      <li>Progress meter to show intermediate results.
+	      <li>Curses-based display.
+	      <li>Detailed transfer rate and transfer time statistics.
+	      <li>Transfer rates and transfer sizes displayed or set using various units (bytes, kibibytes, kilobytes, mebibytes, megabytes, gibibytes, gigabytes.  tebibytes, or terabytes).
+              <li>Output to a logfile for unattended operation.
+	    </ul>
+           </td>
+	</tr>
+
+
+	<tr>
+	  <td>
+	    <a name="news"></a>
+	    <hr style="width: 100%; height: 2px;"><span style="font-weight: bold;">News</span><br>
+	    <br>
+	    <span style="font-weight: bold;"></span>
+	    <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="10">
+	      <tbody>
+		<tr>
+		  <td style="vertical-align: top;">14-Oct-04</td>
+		  <td style="vertical-align: top;">Spew 1.0.3 released.<br>License changed from HP proprietary to GNU Public License (GPL) with permission from Hewlett-Packard.  Kudos to HP for supporting open source.<br>Spew project hosted at Berlios.
+		  </td>
+		</tr>
+	      </tbody>
+	    </table>
+           </td>
+	</tr>
+
+	<tr>
+	  <td>
+	    <a name="download"></a>
+	    <hr style="width: 100%; height: 2px;"><span style="font-weight: bold;">Download</span><br>
+	    <br>
+	    <table style="text-align: left; width: 100%;" border="0" cellpadding="2" cellspacing="10">
+	      <tbody>
+		<tr>
+		  <td style="vertical-align: top;"><a
+		      href="downloads/1.0.3">spew-1.0.3</a><br>
+		  </td>
+		  <td style="vertical-align: top;">Changed license to GPL.<br>No longer do an initial lseek(2) when opening the file, so spew will work with tape drives.
+		  </td>
+		  <td style="vertical-align: top;">stable<br>
+		  </td>
+		</tr>
+	      </tbody>
+	    </table>
+           </td>
+	</tr>
+
+	<tr>
+	  <td>
+	    <a name="src"></a>
+	    <hr style="width: 100%; height: 2px;"><span style="font-weight: bold;">Source archive</span><br>
+	    <br>
+           </td>
+	</tr>
+
+	<tr>
+	  <td>
+	    <a name="screenshots"></a>
+	    <hr style="width: 100%; height: 2px;"><span style="font-weight: bold;">Screenshots</span><br>
+	    <br>
+	    <table style="text-align: left;" border="0" cellpadding="2" cellspacing="15">
+	      <tbody>
+		<tr>
+		  <td colspan=3>Command-line output with verbose statistics.</td>
+		</tr>
+		<tr>
+		  <td style="vertical-align: top;">
+		    <a href="images/spew-cli.png"><img style="border: 0px solid" alt="CLI output 1" src="images/spew-cli-thumbnail.png"></a><br>
+		  </td>
+		</tr>
+
+		<tr>
+		  <td colspan=3><br>Curses-based screen output illustrating intermediate statistics.</td>
+		</tr>
+		<tr>
+		  <td style="vertical-align: top;">
+		    <a href="images/spew-tui1.png"><img style="border: 0px solid" alt="TUI output 1" src="images/spew-tui1-thumbnail.png"></a><br>
+		  </td>
+		  <td style="vertical-align: top;">
+		    <a href="images/spew-tui2.png"><img style="border: 0px solid" alt="TUI output 2" src="images/spew-tui2-thumbnail.png"></a><br>
+		  </td>
+		  <td style="vertical-align: top;">
+		    <a href="images/spew-help.png"><img style="border: 0px solid" alt="TUI help screen" src="images/spew-help-thumbnail.png"></a><br>
+		  </td>
+		</tr>
+
+		<tr>
+		  <td colspan=3><br>Standard console output with intermediate statistics.</td>
+		</tr>
+                <tr>
+		  <td style="vertical-align: top;">
+		    <a href="images/spew-console1.png"><img style="border: 0px solid" alt="console output 1" src="images/spew-console1-thumbnail.png"></a><br>
+		  </td>
+		  <td style="vertical-align: top;">
+		    <a href="images/spew-console2.png"><img style="border: 0px solid" alt="console output 2" src="images/spew-console2-thumbnail.png"></a><br>
+		  </td>
+		</tr>
+	      </tbody>
+	    </table>
+           </td>
+	</tr>
+
+	<tr>
+	  <td>
+	    <a name="documentation"></a>
+	    <hr style="width: 100%; height: 2px;"><span style="font-weight: bold;">Documentation</span><br>
+	    <br>
+
+
+<B>spew</B>
+
+<I>--write|--read|--read-after-write </I>[<I>OPTION</I>]... <I>TRANSFER_SIZE</I>[<I>kKmMgG</I>] <I>FILE</I>
+<p>
+<B>DESCRIPTION</B>
+<p>
+An I/O performance measurement and load generation tool. Writes and/or
+reads generated data to or from a character device, block device, or
+regular file.
+<DL COMPACT>
+<DT><B>--write</B><DD>
+Write data to FILE.
+<DT><B>--read</B><DD>
+Read date from FILE.
+<DT><B>--read-after-write</B><DD>
+Read back data after writing to FILE.
+<DT><B>--raw</B><DD>
+An alias for <B>--read-after-write</B>.
+<DT><B>-b</B>, <B>--min-buffer-size</B>=<I>BUFFER_SIZE</I><DD>
+Each read(2)/write call uses a
+minimum buffer of size BUFFER_SIZE.
+<DT><B>-B</B>, <B>--max-buffer-size</B>=<I>BUFFER_SIZE</I><DD>
+Each read(2)/write(2) call uses a
+maximum buffer of size BUFFER_SIZE.
+<DT><B>-o</B>, <B>--offset</B>=<I>OFFSET</I><DD>
+Seek to OFFSET before starting I/O.
+<DT><B>-p</B>, <B>--pattern</B>=<I>PATTERN</I><DD>
+Use data pattern PATTERN when reading
+or writing data.
+<DT><B>-u</B>, <B>--units</B>=<I>UNITS</I><DD>
+Show tranfer rate in UNITS units.
+<DT><B>-l</B>, <B>--logfile</B>=<I>LOGFILE</I><DD>
+Send log messages to LOGFILE.
+<DT><B>-q</B>, <B>--no-statistics</B><DD>
+Don't output statistics.
+<DT><B>--statistics</B><DD>
+Output statistics (default).
+<DT><B>-v</B>, <B>--detailed-statistics</B><DD>
+Output detailed statistics.
+<DT><B>-s</B>, <B>--sync</B><DD>
+Use synchronous I/O.
+<DT><B>-d</B>, <B>--direct</B><DD>
+Use direct I/O. Should only be used on
+block device files. Not all operating
+systems support direct I/O
+<DT><B>-r</B>, <B>--random</B><DD>
+Read/Write buffers to random offsets.
+<DT><B>--no-progress</B><DD>
+Don't show progess (default).
+<DT><B>-P</B>, <B>--progress</B><DD>
+Show progess.
+<DT><B>-i</B>, <B>--iterations</B>=<I>COUNT</I><DD>
+Write/read data COUNT times. If count
+is 0, repeats forever.
+<DT><B>-c</B>, <B>--continue-after-error</B><DD>
+Continue after data integrity errors.
+<DT><B>-S</B>, <B>--seed</B>=<I>SEED</I><DD>
+Use SEED for random number seed.
+<DT><B>--no-tui</B><DD>
+Don't use TUI interface.
+<DT><B>-t</B>, <B>--tui</B><DD>
+Use curses-based, terminal user
+interface.
+<DT><B>-g</B>, <B>--generate-load</B><DD>
+Equivalent to: <B>-v</B> <B>-t</B> <B>-P</B> <B>-p</B> random <B>-i</B> 0.
+<DT>-?, <B>--help</B><DD>
+Show this help and exit.
+<DT><B>--usage</B><DD>
+Show brief usage message and exit.
+<DT><B>-V</B>, <B>--version</B><DD>
+Output version information and exit.
+<DT>MIN_BUFFER_SIZE<DD>
+Mimimum buffer size used in each
+read(2)/write(2) call (default is
+512 bytes).
+MIN_BUFFER_SIZE. Must be an even
+multiple of 512 bytes and can be
+specified in bytes,
+kibibytes(k), kilobytes(K),
+mebibytes(m), megabytes(M),
+gibibytes(g), gigabytes(G).
+tebibytes(t), or terabytes(T).
+<DT>MAX_BUFFER_SIZE<DD>
+Mimimum buffer size used in each
+read(2)/write(2) call (default is
+MIN_BUFFER_SIZE bytes).
+MAX_BUFFER_SIZE. Must be an even
+multiple of 512 bytes and can be
+specified in bytes,
+kibibytes(k), kilobytes(K),
+mebibytes(m), megabytes(M),
+gibibytes(g), gigabytes(G).
+tebibytes(t), or terabytes(T).
+MAX_BUFFER_SIZE defaults to
+MIN_BUFFER_SIZE.  If MAX_BUFFER_SIZE &gt;
+MIN_BUFFER_SIZE, random buffers sizes
+between the two limits are used.
+MAX_BUFFER_SIZE must be an even
+multiple of MIN_BUFFER_SIZE.
+<DT>OFFSET<DD>
+Position to seek to in the file before
+starting I/O (default is 0). OFFSET
+must be an even multiple of 512 bytes
+and can be specified in bytes,
+kibibytes(k), kilobytes(K),
+mebibytes(m), megabytes(M),
+gibibytes(g), gigabytes(G).
+tebibytes(t), or terabytes(T).
+<DT>PATTERN<DD>
+Data pattern used when writing/reading
+data. Available patterns are: none,
+zeros, random, and numbers. The default
+pattern is none.
+<DT>SEED<DD>
+Used to seed the random number generator
+Must be &gt;= 1 and &lt;= 2^32.
+<DT>TRANSFER_SIZE<DD>
+Total number of bytes to transfer (must
+be an even multiple of both
+MIN_BUFFER_SIZE and MAX_BUFFER)SIZE).
+TRANSER_SIZE can be specified in bytes,
+kilobytes, megabytes, or gigabytes.
+<DT>FILE<DD>
+Regular or device file to write data to.
+<DT>UNITS<DD>
+Kibibytes(k), kilobytes(K),
+mebibytes(m), megabytes(M),
+gibibytes(g), gigabytes(G).
+tebibytes(t), or terabytes(T).
+<DT>LOGFILE<DD>
+Path to a file used for logging.
+</DL>
+<p>
+<b>EXAMPLES</b>
+<p>
+<B>spew --write -b 16k 1m /tmp/bigfile</B>
+<P>
+
+or
+<P>
+
+<B>spew -b 16k 1m /tmp/bigfile</B>
+<P>
+
+Writes 1 mebibyte (1 mebibyte = 1024*1024 bytes) using 16 kibibytes (1
+kibibyte = 1024 bytes) requests to the file <I>/tmp/bigfile</I> using
+the default pattern (random).
+Displays the write transfer rate in kibibytes per second and the write
+transfer time in seconds.
+<P>
+
+<B>spew --write -u m -i 10 -b 1k 256k /dev/sda1</B>
+<P>
+
+or
+<P>
+
+<B>spew -u m -i 10 -b 1k 256k /dev/sda1</B>
+<P>
+
+Writes 256 kibibytes using 1 kibibyte requests to the block device file
+<I>/dev/sda1</I> 10 times using the default pattern (random).
+The iteration and cumulative write transfer rates are displayed in
+mebibytes per second and the iteration and cumulative write transfer times are
+displayed in seconds.
+<P>
+
+<B>spew --raw -d -o 1m -b 16m 1g /tmp/bigfile</B>
+<P>
+
+or
+<P>
+
+<B>regorge -s -o 1m -b 16m 1g /tmp/bigfile</B>
+<P>
+
+Write 1 gibibyte (1 gibibyte = 1024*1024*1024 bytes) starting at an
+offset of 1 mebibyte using 16 mebibyte requests to the file
+<I>/tmp/bigfile</I> using the default pattern (random).
+The data is written synchronously and flushed at file close.
+Then read in the same data using the same request size and offset.
+The data is checked to ensure that the data read in matches the data
+read out.
+Write and read tranfers rates are displayed in kibibytes/second.  Read
+are write transfer times are displayed in seconds.
+<P>
+
+<B>spew --read -i 0 -u M -p zeros -b 512 1m /dev/zero</B>
+<P>
+
+or
+<P>
+
+<B>snarf -i 0 -u M -p zeros -b 512 1m /dev/zero</B>
+<P>
+
+Read 1 mebibyte of data using 512 byte requests from the file
+<I>/dev/zero</I> an infinite number of times using the zeros pattern
+(don't check the data).
+The iteration and cumulative read transfer rates are displayed in
+megabytes (1 megabyte = 1,000,000 bytes) per second and the iteration
+and cumulative read transfer times are displayed in seconds.
+<P>
+
+<B>spew --raw -g -r -b 1k -B 256K 1t /dev/md1</B>
+<P>
+
+or
+<P>
+
+<B>regorge -g -r -b 1k -B 256K 1t /dev/md1</B>
+<P>
+
+Write 1 tebibyte (1 tebibyte = 1024*1024*1024*1024 bytes) using 1-256
+kibibyte requests to the block device <I>/dev/md1</I> using the random
+pattern.  Random seeks are performed before each transfer, but each
+block between the start and end of the data is written exactly once.
+The request sizes are chosen randomly.
+Then read in the same data using the same request sizes and seeks in
+the same sequence.
+Repeat the above sequence an infinite number of times until told to
+quit (via signal or TUI command).
+<P>
+
+The data is checked to ensure that the data read in matches the data
+read out.
+A curses-based TUI is used to diplay iteration and cumulative transfer
+rates, transfer times, and bytes transferred.
+Display verbose statistics after quitting.
+<p>
+<b>ALGORITHMS</b>
+<p>
+
+The folllowing algorithm is used to determine blocksize when
+MAX_BUFFER_SIZE &gt; MIN_BUFFER_SIZE:
+<P>
+
+Find the largest blocksize that is a power of 2 and is &gt;=
+MAX_BUFFER_SIZE.
+Call this maxbuffersize. Find the smallest buffersize that is a power
+of 2 and is &gt;= MIN_BUFFER_SIZE. Call this minbuffersize.
+Chunksize = maxbuffersize * (difference in number of bits between min
+and maxbuffersize + 1).
+The number of chunks is TRANFSER_SIZE/chunksize. Call this numchunks.
+There will be numchunks number of read/writes that are of size
+maxbuffersize, 2 * numchunks number of read/writes that are of size
+maxbuffersize/2, 4 * numchunks number of read/writes that are of size
+maxbuffersize/4, and so on until minbuffersize is reached.
+MIN_BUFFER_SIZE is used for any remaining transfers if TRANSFER_SIZE
+is not evenly divisible by chunksize.
+<P>
+
+Example: Using a MIN_BLOCK_SIZE of 1k, a MAX_BLOCK_SIZE of 8k and a
+TRANSFER_SIZE of 264k results in 8 8k read/writes, 16 4k read/write,
+32 2k read/writes, and 64 + 8 1k read/writes.
+
+           </td>
+	</tr>
+
+	<tr>
+	  <td>
+	    <a name="license"></a>
+	    <hr style="width: 100%; height: 2px;"><span style="font-weight: bold;">License</span><br>
+	    <br>
+Copyright (C) 2004 Hewlett-Packard Corp.
+<p>
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation version 2 of the License.
+<p>
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+<p>
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+675 Mass Ave, Cambridge, MA 02139, USA.
+           </td>
+	</tr>
+
+      </tbody>
+    </table>
+    <hr>
+
+<br><br>
+<center>
+<a href="http://developer.berlios.de" title="BerliOS Developer"> <img src="http://developer.berlios.de/bslogo.php?group_id=2389" width="124px" height="32px" border="0" alt="BerliOS Developer Logo"></a>
+</center>
+<br><br>
+
+<!-- Created: Wed Aug 18 15:57:26 MDT 2004 -->
+<!-- hhmts start -->
+Last modified: Thu Oct 14 18:45:05 MDT 2004
+<!-- hhmts end -->
+
+
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+  </body>
+</html>
