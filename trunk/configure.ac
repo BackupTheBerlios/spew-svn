@@ -27,7 +27,7 @@ AC_PROG_LN_S
 
 # Checks for libraries.
 AC_CHECK_LIB(popt, poptGetContext, ,AC_MSG_ERROR([PACKAGE] requires popt))
-AC_CHECK_LIB(ncurses, is_term_resized, ,AC_MSG_ERROR([PACKAGE] requires ncurses))
+AC_CHECK_LIB(ncurses, wresize, ,AC_MSG_ERROR([PACKAGE] requires ncurses))
 
 # Checks for header files.
 AC_HEADER_STDC
