@@ -135,22 +135,31 @@ owe("403 2808 3076 3617 898 1222 2741 3761 3615 898 1222 4 3590 1222 898 4543 17
             <tbody>
 
               <tr>
-                <td style="vertical-align: top;">9-Dec-04</td>
+                <td style="vertical-align: top;">28-Jan-05</td>
+                <td style="vertical-align: top;">Spew 1.04 released.<br>
+		Outputs I/O's per second (IOPS) statistics.<br>
+		Spew now uses rcfiles to hold common configuration options.<br>
+		The "snarf" executable has been renamed to "gorge" to avoid a 
+		naming conflict with the 
+		<a href="http://www.xach.com/snarf/">snarf<a> project.<br>
+		Fixed minor bugs.
+		</td>
+              </tr>
 
+              <tr>
+                <td style="vertical-align: top;">9-Dec-04</td>
                 <td style="vertical-align: top;">Added statically linked binaries for HP-UX 11.0.  See <a href="ftp://ftp.berlios.de/pub/spew/1.0.3/index.html">HP-UX 11.0</a>.
                 </td>
               </tr>
 
               <tr>
                 <td style="vertical-align: top;">11-Nov-04</td>
-
                 <td style="vertical-align: top;">Matt Taggart has created spew packages for Debian/unstable.  Details at <a href="http://packages.debian.org/unstable/utils/spew">packages.debian.org</a>.
                 </td>
               </tr>
 
               <tr>
                 <td style="vertical-align: top;">14-Oct-04</td>
-
                 <td style="vertical-align: top;">Spew 1.0.3
                 released.<br>
                 License changed from HP proprietary to GNU Public
@@ -176,6 +185,21 @@ owe("403 2808 3076 3617 898 1222 2741 3761 3615 898 1222 4 3590 1222 898 4543 17
             <tbody>
               <tr>
                 <td style="vertical-align: top;"><a href=
+                "ftp://ftp.berlios.de/pub/spew/1.0.4/index.html">spew-1.0.4</a><br>
+                </td>
+
+                <td style="vertical-align: top;">Outputs I/O's per second
+                (IOPS) statistics.<br>
+		Spew now uses rcfiles to hold common configuration options.<br>
+		The "snarf" executable has been renamed to "gorge" to avoid a 
+		naming conflict with the 
+		<a href="http://www.xach.com/snarf/">snarf<a> project.<br>
+		Fixed minor bugs.
+                <td style="vertical-align: top;">stable<br></td>
+              </tr>
+
+              <tr>
+                <td style="vertical-align: top;"><a href=
                 "ftp://ftp.berlios.de/pub/spew/1.0.3/index.html">spew-1.0.3</a><br>
                 </td>
 
@@ -186,6 +210,7 @@ owe("403 2808 3076 3617 898 1222 2741 3761 3615 898 1222 4 3590 1222 898 4543 17
 
                 <td style="vertical-align: top;">stable<br></td>
               </tr>
+
             </tbody>
           </table>
         </td>
@@ -225,6 +250,14 @@ owe("403 2808 3076 3617 898 1222 2741 3761 3615 898 1222 4 3590 1222 898 4543 17
                 "http://svn.berlios.de/viewcvs/spew/trunk/">trunk</a><br>
                 </td>
 		  <td style="vertical-align: top;">Top-of-tree</a><br>
+                </td>
+              </tr>
+              <tr>
+                <td style="vertical-align: top;"><a href=
+                "http://svn.berlios.de/viewcvs/spew/tags/1.0.4/">1.0.4</a><br>
+                </td>
+                </td>
+		  <td style="vertical-align: top;">Latest release</a><br>
                 </td>
               </tr>
               <tr>
@@ -312,307 +345,223 @@ owe("403 2808 3076 3617 898 1222 2741 3761 3615 898 1222 4 3590 1222 898 4543 17
           <a name="documentation" id="documentation"></a>
           <hr style="width: 100%; height: 2px;">
           <span style="font-weight: bold;">Documentation</span><br>
+
           <br>
-          <b>spew</b> <i>--write|--read|--read-after-write</i>
-          [<i>OPTION</i>]... <i>TRANSFER_SIZE</i>[<i>kKmMgG</i>]
-          <i>FILE</i>
-
-          <p><b>DESCRIPTION</b></p>
-
-          <p>An I/O performance measurement and load generation
-          tool. Writes and/or reads generated data to or from a
-          character device, block device, or regular file.</p>
-
-          <dl compact>
-            <dt><b>--write</b></dt>
-
-            <dd>Write data to FILE.</dd>
-
-            <dt><b>--read</b></dt>
-
-            <dd>Read date from FILE.</dd>
-
-            <dt><b>--read-after-write</b></dt>
-
-            <dd>Read back data after writing to FILE.</dd>
-
-            <dt><b>--raw</b></dt>
-
-            <dd>An alias for <b>--read-after-write</b>.</dd>
-
-            <dt><b>-b</b>,
-            <b>--min-buffer-size</b>=<i>BUFFER_SIZE</i></dt>
-
-            <dd>Each read(2)/write call uses a minimum buffer of
-            size BUFFER_SIZE.</dd>
-
-            <dt><b>-B</b>,
-            <b>--max-buffer-size</b>=<i>BUFFER_SIZE</i></dt>
-
-            <dd>Each read(2)/write(2) call uses a maximum buffer of
-            size BUFFER_SIZE.</dd>
-
-            <dt><b>-o</b>, <b>--offset</b>=<i>OFFSET</i></dt>
-
-            <dd>Seek to OFFSET before starting I/O.</dd>
-
-            <dt><b>-p</b>, <b>--pattern</b>=<i>PATTERN</i></dt>
-
-            <dd>Use data pattern PATTERN when reading or writing
-            data.</dd>
-
-            <dt><b>-u</b>, <b>--units</b>=<i>UNITS</i></dt>
-
-            <dd>Show tranfer rate in UNITS units.</dd>
-
-            <dt><b>-l</b>, <b>--logfile</b>=<i>LOGFILE</i></dt>
-
-            <dd>Send log messages to LOGFILE.</dd>
-
-            <dt><b>-q</b>, <b>--no-statistics</b></dt>
-
-            <dd>Don't output statistics.</dd>
-
-            <dt><b>--statistics</b></dt>
-
-            <dd>Output statistics (default).</dd>
-
-            <dt><b>-v</b>, <b>--detailed-statistics</b></dt>
-
-            <dd>Output detailed statistics.</dd>
-
-            <dt><b>-s</b>, <b>--sync</b></dt>
-
-            <dd>Use synchronous I/O.</dd>
-
-            <dt><b>-d</b>, <b>--direct</b></dt>
-
-            <dd>Use direct I/O. Should only be used on block device
-            files. Not all operating systems support direct
-            I/O</dd>
-
-            <dt><b>-r</b>, <b>--random</b></dt>
-
-            <dd>Read/Write buffers to random offsets.</dd>
-
-            <dt><b>--no-progress</b></dt>
-
-            <dd>Don't show progess (default).</dd>
-
-            <dt><b>-P</b>, <b>--progress</b></dt>
-
-            <dd>Show progess.</dd>
-
-            <dt><b>-i</b>, <b>--iterations</b>=<i>COUNT</i></dt>
-
-            <dd>Write/read data COUNT times. If count is 0, repeats
-            forever.</dd>
-
-            <dt><b>-c</b>, <b>--continue-after-error</b></dt>
-
-            <dd>Continue after data integrity errors.</dd>
-
-            <dt><b>-S</b>, <b>--seed</b>=<i>SEED</i></dt>
-
-            <dd>Use SEED for random number seed.</dd>
-
-            <dt><b>--no-tui</b></dt>
-
-            <dd>Don't use TUI interface.</dd>
-
-            <dt><b>-t</b>, <b>--tui</b></dt>
-
-            <dd>Use curses-based, terminal user interface.</dd>
-
-            <dt><b>-g</b>, <b>--generate-load</b></dt>
-
-            <dd>Equivalent to: <b>-v</b> <b>-t</b> <b>-P</b>
-            <b>-p</b> random <b>-i</b> 0.</dd>
-
-            <dt>-?, <b>--help</b></dt>
-
-            <dd>Show this help and exit.</dd>
-
-            <dt><b>--usage</b></dt>
-
-            <dd>Show brief usage message and exit.</dd>
-
-            <dt><b>-V</b>, <b>--version</b></dt>
-
-            <dd>Output version information and exit.</dd>
-
-            <dt>MIN_BUFFER_SIZE</dt>
-
-            <dd>Mimimum buffer size used in each read(2)/write(2)
-            call (default is 512 bytes). MIN_BUFFER_SIZE. Must be
-            an even multiple of 512 bytes and can be specified in
-            bytes, kibibytes(k), kilobytes(K), mebibytes(m),
-            megabytes(M), gibibytes(g), gigabytes(G). tebibytes(t),
-            or terabytes(T).</dd>
-
-            <dt>MAX_BUFFER_SIZE</dt>
-
-            <dd>Mimimum buffer size used in each read(2)/write(2)
-            call (default is MIN_BUFFER_SIZE bytes).
-            MAX_BUFFER_SIZE. Must be an even multiple of 512 bytes
-            and can be specified in bytes, kibibytes(k),
-            kilobytes(K), mebibytes(m), megabytes(M), gibibytes(g),
-            gigabytes(G). tebibytes(t), or terabytes(T).
-            MAX_BUFFER_SIZE defaults to MIN_BUFFER_SIZE. If
-            MAX_BUFFER_SIZE &gt; MIN_BUFFER_SIZE, random buffers
-            sizes between the two limits are used. MAX_BUFFER_SIZE
-            must be an even multiple of MIN_BUFFER_SIZE.</dd>
-
-            <dt>OFFSET</dt>
-
-            <dd>Position to seek to in the file before starting I/O
-            (default is 0). OFFSET must be an even multiple of 512
-            bytes and can be specified in bytes, kibibytes(k),
-            kilobytes(K), mebibytes(m), megabytes(M), gibibytes(g),
-            gigabytes(G). tebibytes(t), or terabytes(T).</dd>
-
-            <dt>PATTERN</dt>
-
-            <dd>Data pattern used when writing/reading data.
-            Available patterns are: none, zeros, random, and
-            numbers. The default pattern is none.</dd>
-
-            <dt>SEED</dt>
-
-            <dd>Used to seed the random number generator Must be
-            &gt;= 1 and &lt;= 2^32.</dd>
-
-            <dt>TRANSFER_SIZE</dt>
-
-            <dd>Total number of bytes to transfer (must be an even
-            multiple of both MIN_BUFFER_SIZE and MAX_BUFFER)SIZE).
-            TRANSER_SIZE can be specified in bytes, kilobytes,
-            megabytes, or gigabytes.</dd>
-
-            <dt>FILE</dt>
-
-            <dd>Regular or device file to write data to.</dd>
-
-            <dt>UNITS</dt>
-
-            <dd>Kibibytes(k), kilobytes(K), mebibytes(m),
-            megabytes(M), gibibytes(g), gigabytes(G). tebibytes(t),
-            or terabytes(T).</dd>
-
-            <dt>LOGFILE</dt>
-
-            <dd>Path to a file used for logging.</dd>
-          </dl>
-
-          <p><b>EXAMPLES</b></p>
-
-          <p><b>spew --write -b 16k 1m /tmp/bigfile</b></p>
-
-          <p>or</p>
-
-          <p><b>spew -b 16k 1m /tmp/bigfile</b></p>
-
-          <p>Writes 1 mebibyte (1 mebibyte = 1024*1024 bytes) using
-          16 kibibytes (1 kibibyte = 1024 bytes) requests to the
-          file <i>/tmp/bigfile</i> using the default pattern
-          (random). Displays the write transfer rate in kibibytes
-          per second and the write transfer time in seconds.</p>
-
-          <p><b>spew --write -u m -i 10 -b 1k 256k
-          /dev/sda1</b></p>
-
-          <p>or</p>
-
-          <p><b>spew -u m -i 10 -b 1k 256k /dev/sda1</b></p>
-
-          <p>Writes 256 kibibytes using 1 kibibyte requests to the
-          block device file <i>/dev/sda1</i> 10 times using the
-          default pattern (random). The iteration and cumulative
-          write transfer rates are displayed in mebibytes per
-          second and the iteration and cumulative write transfer
-          times are displayed in seconds.</p>
-
-          <p><b>spew --raw -d -o 1m -b 16m 1g /tmp/bigfile</b></p>
-
-          <p>or</p>
-
-          <p><b>regorge -s -o 1m -b 16m 1g /tmp/bigfile</b></p>
-
-          <p>Write 1 gibibyte (1 gibibyte = 1024*1024*1024 bytes)
-          starting at an offset of 1 mebibyte using 16 mebibyte
-          requests to the file <i>/tmp/bigfile</i> using the
-          default pattern (random). The data is written
-          synchronously and flushed at file close. Then read in the
-          same data using the same request size and offset. The
-          data is checked to ensure that the data read in matches
-          the data read out. Write and read tranfers rates are
-          displayed in kibibytes/second. Read are write transfer
-          times are displayed in seconds.</p>
-
-          <p><b>spew --read -i 0 -u M -p zeros -b 512 1m
-          /dev/zero</b></p>
-
-          <p>or</p>
-
-          <p><b>snarf -i 0 -u M -p zeros -b 512 1m
-          /dev/zero</b></p>
-
-          <p>Read 1 mebibyte of data using 512 byte requests from
-          the file <i>/dev/zero</i> an infinite number of times
-          using the zeros pattern (don't check the data). The
-          iteration and cumulative read transfer rates are
-          displayed in megabytes (1 megabyte = 1,000,000 bytes) per
-          second and the iteration and cumulative read transfer
-          times are displayed in seconds.</p>
-
-          <p><b>spew --raw -g -r -b 1k -B 256K 1t /dev/md1</b></p>
-
-          <p>or</p>
-
-          <p><b>regorge -g -r -b 1k -B 256K 1t /dev/md1</b></p>
-
-          <p>Write 1 tebibyte (1 tebibyte = 1024*1024*1024*1024
-          bytes) using 1-256 kibibyte requests to the block device
-          <i>/dev/md1</i> using the random pattern. Random seeks
-          are performed before each transfer, but each block
-          between the start and end of the data is written exactly
-          once. The request sizes are chosen randomly. Then read in
-          the same data using the same request sizes and seeks in
-          the same sequence. Repeat the above sequence an infinite
-          number of times until told to quit (via signal or TUI
-          command).</p>
-
-          <p>The data is checked to ensure that the data read in
-          matches the data read out. A curses-based TUI is used to
-          diplay iteration and cumulative transfer rates, transfer
-          times, and bytes transferred. Display verbose statistics
-          after quitting.</p>
-
-          <p><b>ALGORITHMS</b></p>
-
-          <p>The folllowing algorithm is used to determine
-          blocksize when MAX_BUFFER_SIZE &gt; MIN_BUFFER_SIZE:</p>
-
-          <p>Find the largest blocksize that is a power of 2 and is
-          &gt;= MAX_BUFFER_SIZE. Call this maxbuffersize. Find the
-          smallest buffersize that is a power of 2 and is &gt;=
-          MIN_BUFFER_SIZE. Call this minbuffersize. Chunksize =
-          maxbuffersize * (difference in number of bits between min
-          and maxbuffersize + 1). The number of chunks is
-          TRANFSER_SIZE/chunksize. Call this numchunks. There will
-          be numchunks number of read/writes that are of size
-          maxbuffersize, 2 * numchunks number of read/writes that
-          are of size maxbuffersize/2, 4 * numchunks number of
-          read/writes that are of size maxbuffersize/4, and so on
-          until minbuffersize is reached. MIN_BUFFER_SIZE is used
-          for any remaining transfers if TRANSFER_SIZE is not
-          evenly divisible by chunksize.</p>
-
-          <p>Example: Using a MIN_BLOCK_SIZE of 1k, a
-          MAX_BLOCK_SIZE of 8k and a TRANSFER_SIZE of 264k results
-          in 8 8k read/writes, 16 4k read/write, 32 2k read/writes,
-          and 64 + 8 1k read/writes.</p>
-        </td>
+<h4>NAME</h4>
+spew - measures I/O performance and/or generates I/O load <a name=
+"lbAC" id="lbAC">&nbsp;</a>
+<h4>SYNOPSIS</h4>
+<b>spew</b> <i>--write|--read|--read-after-write</i>
+[<i>OPTION</i>]... <i>TRANSFER_SIZE</i>[<i>kKmMgG</i>] <i>FILE</i>
+<a name="lbAD" id="lbAD">&nbsp;</a>
+<h4>DESCRIPTION</h4>
+An I/O performance measurement and load generation tool. Writes
+and/or reads generated data to or from a character device, block
+device, or regular file.
+<dl compact>
+<dt><b>-B</b>, <b>--max-buffer-size</b>=<i>BUFFER_SIZE</i></dt>
+<dd>Each <a href=
+"/cgi-bin/man/man2html?2+read">read</a>(2)/<a href="/cgi-bin/man/man2html?2+write">
+write</a>(2) call uses a maximum buffer of size BUFFER_SIZE.</dd>
+<dt><b>-b</b>, <b>--min-buffer-size</b>=<i>BUFFER_SIZE</i></dt>
+<dd>Each <a href=
+"/cgi-bin/man/man2html?2+read">read</a>(2)/<a href="/cgi-bin/man/man2html?2+write">
+write</a>(2) call uses a minimum buffer of size BUFFER_SIZE.</dd>
+<dt><b>-c</b>, <b>--continue-after-error</b></dt>
+<dd>Continue after data integrity errors.</dd>
+<dt><b>-d</b>, <b>--direct</b></dt>
+<dd>Use direct I/O. Should only be used on block device files. Not
+all operating systems support direct I/O</dd>
+<dt><b>-g</b>, <b>--generate-load</b></dt>
+<dd>Equivalent to: <b>-v</b> <b>-t</b> <b>-P</b> <b>-p</b> random
+<b>-i</b> 0.</dd>
+<dt><b>-i</b>, <b>--iterations</b>=<i>COUNT</i></dt>
+<dd>Write/read data COUNT times. If count is 0, repeats
+forever.</dd>
+<dt><b>-l</b>, <b>--logfile</b>=<i>LOGFILE</i></dt>
+<dd>Send log messages to LOGFILE.</dd>
+<dt><b>--no-progress</b></dt>
+<dd>Don't show progess (default).</dd>
+<dt><b>--no-rcfiles</b></dt>
+<dd>Don't use standard rcfiles.</dd>
+<dt><b>-q</b>, <b>--no-statistics</b></dt>
+<dd>Don't output statistics.</dd>
+<dt><b>--no-tui</b></dt>
+<dd>Don't use TUI interface.</dd>
+<dt><b>-o</b>, <b>--offset</b>=<i>OFFSET</i></dt>
+<dd>Seek to OFFSET before starting I/O.</dd>
+<dt><b>-P</b>, <b>--progress</b></dt>
+<dd>Show progess.</dd>
+<dt><b>-p</b>, <b>--pattern</b>=<i>PATTERN</i></dt>
+<dd>Use data pattern PATTERN when reading or writing data.</dd>
+<dt><b>-r</b>, <b>--random</b></dt>
+<dd>Read/Write buffers to random offsets.</dd>
+<dt><b>--raw</b></dt>
+<dd>An alias for <b>--read-after-write</b>.</dd>
+<dt><b>--rcfile</b>=<i>RCFILE</i></dt>
+<dd>Read command-line options from RCFILE.</dd>
+<dt><b>--read</b></dt>
+<dd>Read date from FILE.</dd>
+<dt><b>--read-after-write</b></dt>
+<dd>Read back data after writing to FILE.</dd>
+<dt><b>-S</b>, <b>--seed</b>=<i>SEED</i></dt>
+<dd>Use SEED for random number seed.</dd>
+<dt><b>-s</b>, <b>--sync</b></dt>
+<dd>Use synchronous I/O.</dd>
+<dt><b>--statistics</b></dt>
+<dd>Output statistics (default).</dd>
+<dt><b>-t</b>, <b>--tui</b></dt>
+<dd>Use curses-based, terminal user interface.</dd>
+<dt><b>-u</b>, <b>--units</b>=<i>UNITS</i></dt>
+<dd>Show tranfer rate in UNITS units.</dd>
+<dt><b>--usage</b></dt>
+<dd>Show brief usage message and exit.</dd>
+<dt><b>-V</b>, <b>--version</b></dt>
+<dd>Output version information and exit.</dd>
+<dt><b>-v</b>, <b>--detailed-statistics</b></dt>
+<dd>Output detailed statistics.</dd>
+<dt><b>--write</b></dt>
+<dd>Write data to FILE.</dd>
+<dt>-?, <b>--help</b></dt>
+<dd>Show this help and exit.</dd>
+<dt>FILE</dt>
+<dd>Regular or device file to write data to.</dd>
+<dt>LOGFILE</dt>
+<dd>Path to a file used for logging.</dd>
+<dt>MAX_BUFFER_SIZE</dt>
+<dd>Mimimum buffer size used in each <a href=
+"/cgi-bin/man/man2html?2+read">read</a>(2)/<a href=
+"/cgi-bin/man/man2html?2+write">write</a>(2) call (default is
+MIN_BUFFER_SIZE bytes). MAX_BUFFER_SIZE. Must be an even multiple
+of 512 bytes and can be specified in bytes, kibibytes(k),
+kilobytes(K), mebibytes(m), megabytes(M), gibibytes(g),
+gigabytes(G). tebibytes(t), or terabytes(T). MAX_BUFFER_SIZE
+defaults to MIN_BUFFER_SIZE. If MAX_BUFFER_SIZE &gt;
+MIN_BUFFER_SIZE, random buffers sizes between the two limits are
+used. MAX_BUFFER_SIZE must be an even multiple of
+MIN_BUFFER_SIZE.</dd>
+<dt>MIN_BUFFER_SIZE</dt>
+<dd>Mimimum buffer size used in each <a href=
+"/cgi-bin/man/man2html?2+read">read</a>(2)/<a href=
+"/cgi-bin/man/man2html?2+write">write</a>(2) call (default is 512
+bytes). MIN_BUFFER_SIZE. Must be an even multiple of 512 bytes and
+can be specified in bytes, kibibytes(k), kilobytes(K),
+mebibytes(m), megabytes(M), gibibytes(g), gigabytes(G).
+tebibytes(t), or terabytes(T).</dd>
+<dt>OFFSET</dt>
+<dd>Position to seek to in the file before starting I/O (default is
+0). OFFSET must be an even multiple of 512 bytes and can be
+specified in bytes, kibibytes(k), kilobytes(K), mebibytes(m),
+megabytes(M), gibibytes(g), gigabytes(G). tebibytes(t), or
+terabytes(T).</dd>
+<dt>PATTERN</dt>
+<dd>Data pattern used when writing/reading data. Available patterns
+are: none, zeros, random, and numbers. The default pattern is
+none.</dd>
+<dt>RCFILE</dt>
+<dd>Read additional command-line options from RCFILE. Other options
+on the command-line will override options in RCFILE.</dd>
+<dt>SEED</dt>
+<dd>Used to seed the random number generator Must be &gt;= 1 and
+&lt;= 2^32.</dd>
+<dt>TRANSFER_SIZE</dt>
+<dd>Total number of bytes to transfer (must be an even multiple of
+both MIN_BUFFER_SIZE and MAX_BUFFER)SIZE). TRANSER_SIZE can be
+specified in bytes, kilobytes, megabytes, or gigabytes.</dd>
+<dt>UNITS</dt>
+<dd>Kibibytes(k), kilobytes(K), mebibytes(m), megabytes(M),
+gibibytes(g), gigabytes(G). tebibytes(t), or terabytes(T).</dd>
+</dl>
+<a name="lbAE" id="lbAE">&nbsp;</a>
+<h4>EXAMPLES</h4>
+<b>spew --write -b 16k 1m /tmp/bigfile</b>
+<p>or</p>
+<p><b>spew -b 16k 1m /tmp/bigfile</b></p>
+<p>Writes 1 mebibyte (1 mebibyte = 1024*1024 bytes) using 16
+kibibytes (1 kibibyte = 1024 bytes) requests to the file
+<i>/tmp/bigfile</i> using the default pattern (random). Displays
+the write transfer rate in kibibytes per second and the write
+transfer time in seconds.</p>
+<p><b>spew --write -u m -i 10 -b 1k 256k /dev/sda1</b></p>
+<p>or</p>
+<p><b>spew -u m -i 10 -b 1k 256k /dev/sda1</b></p>
+<p>Writes 256 kibibytes using 1 kibibyte requests to the block
+device file <i>/dev/sda1</i> 10 times using the default pattern
+(random). The iteration and cumulative write transfer rates are
+displayed in mebibytes per second and the iteration and cumulative
+write transfer times are displayed in seconds.</p>
+<p><b>spew --raw -d -o 1m -b 16m 1g /tmp/bigfile</b></p>
+<p>or</p>
+<p><b>regorge -s -o 1m -b 16m 1g /tmp/bigfile</b></p>
+<p>Write 1 gibibyte (1 gibibyte = 1024*1024*1024 bytes) starting at
+an offset of 1 mebibyte using 16 mebibyte requests to the file
+<i>/tmp/bigfile</i> using the default pattern (random). The data is
+written synchronously and flushed at file close. Then read in the
+same data using the same request size and offset. The data is
+checked to ensure that the data read in matches the data read out.
+Write and read tranfers rates are displayed in kibibytes/second.
+Read are write transfer times are displayed in seconds.</p>
+<p><b>spew --read -i 0 -u M -p zeros -b 512 1m /dev/zero</b></p>
+<p>or</p>
+<p><b>gorge -i 0 -u M -p zeros -b 512 1m /dev/zero</b></p>
+<p>Read 1 mebibyte of data using 512 byte requests from the file
+<i>/dev/zero</i> an infinite number of times using the zeros
+pattern (don't check the data). The iteration and cumulative read
+transfer rates are displayed in megabytes (1 megabyte = 1,000,000
+bytes) per second and the iteration and cumulative read transfer
+times are displayed in seconds.</p>
+<p><b>spew --raw -g -r -b 1k -B 256K 1t /dev/md1</b></p>
+<p>or</p>
+<p><b>regorge -g -r -b 1k -B 256K 1t /dev/md1</b></p>
+<p>Write 1 tebibyte (1 tebibyte = 1024*1024*1024*1024 bytes) using
+1-256 kibibyte requests to the block device <i>/dev/md1</i> using
+the random pattern. Random seeks are performed before each
+transfer, but each block between the start and end of the data is
+written exactly once. The request sizes are chosen randomly. Then
+read in the same data using the same request sizes and seeks in the
+same sequence. Repeat the above sequence an infinite number of
+times until told to quit (via signal or TUI command).</p>
+<p>The data is checked to ensure that the data read in matches the
+data read out. A curses-based TUI is used to diplay iteration and
+cumulative transfer rates, transfer times, and bytes transferred.
+Display verbose statistics after quitting. <a name="lbAF" id=
+"lbAF">&nbsp;</a></p>
+<h4>ALGORITHMS</h4>
+The folllowing algorithm is used to determine blocksize when
+MAX_BUFFER_SIZE &gt; MIN_BUFFER_SIZE:
+<p>Find the largest blocksize that is a power of 2 and is &gt;=
+MAX_BUFFER_SIZE. Call this maxbuffersize. Find the smallest
+buffersize that is a power of 2 and is &gt;= MIN_BUFFER_SIZE. Call
+this minbuffersize. Chunksize = maxbuffersize * (difference in
+number of bits between min and maxbuffersize + 1). The number of
+chunks is TRANFSER_SIZE/chunksize. Call this numchunks. There will
+be numchunks number of read/writes that are of size maxbuffersize,
+2 * numchunks number of read/writes that are of size
+maxbuffersize/2, 4 * numchunks number of read/writes that are of
+size maxbuffersize/4, and so on until minbuffersize is reached.
+MIN_BUFFER_SIZE is used for any remaining transfers if
+TRANSFER_SIZE is not evenly divisible by chunksize.</p>
+<p>Example: Using a MIN_BLOCK_SIZE of 1k, a MAX_BLOCK_SIZE of 8k
+and a TRANSFER_SIZE of 264k results in 8 8k read/writes, 16 4k
+read/write, 32 2k read/writes, and 64 + 8 1k read/writes. <a name=
+"lbAG" id="lbAG">&nbsp;</a></p>
+<h4>PATTERNS</h4>
+Use the following <a href="/cgi-bin/man/man2html?1+od">od</a>(1)
+command to examine spew generated files where a data integrity
+problem has occurred:
+<p>od -A d --format=d8 --width=32 &lt;file&gt;</p>
+<p><a name="lbAH" id="lbAH">&nbsp;</a></p>
+<h4>FILES</h4>
+<dl compact>
+<dt>$HOME/.spewrc or $SPEWRC</dt>
+<dd>Holds user default options. These options precede any options
+included on the command-line.</dd>
+<dt>/usr/local/etc/spew.conf</dt>
+<dd>Holds system-wide default options. These options precede any
+options included on the command-line and options included from
+$HOME/.spewrc or $SPEWRC.</dd>
+</dl>
+	<td>
       </tr>
 
       <tr>
@@ -656,7 +605,7 @@ owe("403 2808 3076 3617 898 1222 2741 3761 3615 898 1222 4 3590 1222 898 4543 17
   <br>
   <!-- Created: Wed Aug 18 15:57:26 MDT 2004 -->
   <!-- hhmts start -->
-Last modified: Thu Dec  9 17:34:49 MST 2004
+Last modified: Fri Jan 28 16:05:35 MST 2005
 <!-- hhmts end -->
   <br>
   <br>
