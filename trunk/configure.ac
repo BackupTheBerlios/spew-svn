@@ -98,7 +98,11 @@ AC_ARG_ENABLE(static-link,
 
 STATIC_LINK=""
 if test "x$static_spew" = "xyes" ; then
+  if test "x`uname`" = "xHP-UX" ; then
+    STATIC_LINK="-Wl,-a,archive_shared"
+  else
     STATIC_LINK="-static"
+  fi
 fi
 AC_SUBST(STATIC_LINK)
 
