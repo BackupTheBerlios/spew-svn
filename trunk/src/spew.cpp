@@ -309,14 +309,14 @@ capacity_t get_size(const char *arg)
          size *= 1024LL * 1024LL * 1024LL * 102;
          break;
       default:
-         error_msg("Invalid unit\n");
+         error_msg("Invalid unit in argument \"%s\"\n", arg);
          exit(EXIT_ERROR_USAGE);
          break;
       }
    }
    else if (sscanf(arg, "%llu", &size) != 1)
    {
-      error_msg("Could not parse size.\n");
+      error_msg("Could not parse size for argument \"%s\".\n", arg);
       exit(EXIT_ERROR_USAGE);
    }
    return size;
@@ -358,14 +358,14 @@ Units_t get_units(const char *arg)
          units = TERABYTES;
          break;
       default:
-         error_msg("Invalid units - use kKmMgG.\n");
+         error_msg("Invalid unit in argument \"%s\" - use kKmMgG.\n", arg);
          exit(EXIT_ERROR_USAGE);
          break;
       }
    }
    else
    {
-      error_msg("Could not parse units.\n");
+      error_msg("Could not parse units in argument \"%s\"\n", arg);
       exit(EXIT_ERROR_USAGE);
    }
    return units;
@@ -589,9 +589,15 @@ bool parse_options(int argc, const char **argv)
    if (gIterationsToDo < 0)
       gIterationsToDo = DEFAULT_ITERATIONS;
 
-   if (poptPeekArg(context))
-      gTransferSize = get_size(poptGetArg(context));
-   else
+   // Count the rest of the arguments.
+   const char **argsLeft = poptGetArgs(context);
+   int argsCount;
+   if (argsLeft)
+   {
+      for (argsCount = 0;  argsLeft[argsCount] != NULL; argsCount++)
+         ;
+   }
+   if (argsCount < 2)
    {
       error_msg("Need TRANSFER_SIZE and FILE.\n");
       usage(context);
@@ -599,15 +605,8 @@ bool parse_options(int argc, const char **argv)
       return false;
    }
 
-   if (poptPeekArg(context))
-      gFile = poptGetArg(context);
-   else
-   {
-      error_msg("Need FILE.\n");
-      usage(context);
-      poptFreeContext(context);
-      return false;
-   }
+   gTransferSize = get_size(poptGetArg(context));
+   gFile = poptGetArg(context);
 
    if (gSeed == DEFAULT_SEED)
    {
@@ -683,12 +682,12 @@ bool validate_options()
    {
       if (gMinBufferSize % Transfer::DIRECTIO_BUFFER_SIZE_INCREMENT != 0)
       {
-         error_msg("MIN_BUFFER_SIZE must be a multiple of %llu bytes when using direct I/O.\n", Transfer::DIRECTIO_BUFFER_SIZE_INCREMENT);
+         error_msg("MIN_BUFFER_SIZE must be a multiple of %llu bytes when using direct I/O. Use -b|--min-buffer-size to set MIN_BUFFER_SIZE.\n", Transfer::DIRECTIO_BUFFER_SIZE_INCREMENT);
          return false;
       }
       if (gMaxBufferSize % Transfer::DIRECTIO_BUFFER_SIZE_INCREMENT != 0)
       {
-         error_msg("MAX_BUFFER_SIZE must be a multiple of %llu bytes when using direct I/O.\n", Transfer::DIRECTIO_BUFFER_SIZE_INCREMENT);
+         error_msg("MAX_BUFFER_SIZE must be a multiple of %llu bytes when using direct I/O. Use -B|--max-buffer-size to set MAX_BUFFER_SIZE.\n", Transfer::DIRECTIO_BUFFER_SIZE_INCREMENT);
          return false;
       }
    }
