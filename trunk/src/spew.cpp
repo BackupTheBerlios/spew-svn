@@ -137,6 +137,8 @@ TimeHack gTotalReadTransferTime;
 TimeHack gTotalWriteTransferTime;
 capacity_t gTotalBytesRead = 0;
 capacity_t gTotalBytesWritten = 0;
+capacity_t gTotalWriteOps = 0;
+capacity_t gTotalReadOps = 0;
 TimeHack gProgramStartTime;
 unsigned int gFoundTransferErrors = 0;
 
@@ -964,27 +966,32 @@ void cumulative_statistics(const Job *job,
                                   jobTransferTime.getTime(),
                                   gTotalBytesRead,
                                   gTotalReadTransferTime.getTime(),
+                                  gTotalReadOps,
                                   gTotalBytesWritten,
                                   gTotalWriteTransferTime.getTime(), 
+                                  gTotalWriteOps,
                                   now - gProgramStartTime);
 
    long double transferRate = convertCapacity((long double)job->getJobBytesTransferred(), gUnits)/jobTransferTime.getTime();
+   long double iops = (long double)job->getTotalNumberOfTransfers()/(long double)jobTransferTime.getTime();
 
    switch (ioDirection)
    {
    case READING:
-      gLogger->logNote("Iter: %5d   Read Transfer rate: %11.2Lf %-5s    Transfer time: %s\n",
+      gLogger->logNote("Iter: %5d   RTR: %11.2Lf %-5s   TT: %s   IOPS: %11.2Lf\n",
                        iteration,
                        transferRate, 
                        getTransferRateUnitsStr(gUnits), 
-                       jobTransferTime.getElapsedTimeStr().c_str());
+                       jobTransferTime.getElapsedTimeStr().c_str(),
+                       iops);
       break;
    case WRITING:
-      gLogger->logNote("Iter: %5d  Write Transfer rate: %11.2Lf %-5s    Transfer time: %s\n",
+      gLogger->logNote("Iter: %5d   WTR: %11.2Lf %-5s   TT: %s   IOPS: %11.2Lf\n",
                        iteration,
                        transferRate, 
                        getTransferRateUnitsStr(gUnits), 
-                       jobTransferTime.getElapsedTimeStr().c_str());
+                       jobTransferTime.getElapsedTimeStr().c_str(),
+                       iops);
       break;
    }  
 }
@@ -996,33 +1003,38 @@ void run_statistics(unsigned int iterations)
    unsigned int device;
    device = Log::OUTPUT_LOG_STDOUT;
    if (gVerbosity == VERBOSITY_LONG)
-   {
       device |= Log::OUTPUT_DISPLAY_STDOUT;
-      TimeHack now(TimeHack::getCurrentTime());
 
-      if (!gUseTui)
-         gLogger->note(device, "\n");
-      gLogger->note(device, "Total iterations:          %17u\n", iterations);
-      gLogger->note(device, "Total runtime:             %17s\n",
-                    gProgramStartTime.getTimeDiffStr(now).c_str());
+   TimeHack now(TimeHack::getCurrentTime());
 
-      if (gTotalBytesWritten > 0)
-      {
-         long double writeTransferRate = convertCapacity((long double)gTotalBytesWritten, gUnits)/(long double)gTotalWriteTransferTime.getTime();
-         gLogger->note(device, "Total write transfer time: %17s\n", 
-                       gTotalWriteTransferTime.getElapsedTimeStr().c_str());
-         gLogger->note(device, "Total write transfer rate: %11.2Lf %-5s\n",
-                       writeTransferRate, getTransferRateUnitsStr(gUnits));
-      }
-      if (gTotalBytesRead > 0)
+   if (!gUseTui)
+      gLogger->note(device, "\n");
+   gLogger->note(device, "Total iterations:                %17u\n",
+                 iterations);
+   gLogger->note(device, "Total runtime:                   %17s\n",
+                 gProgramStartTime.getTimeDiffStr(now).c_str());
+
+   if (gTotalBytesWritten > 0)
+   {
+      long double writeTransferRate = convertCapacity((long double)gTotalBytesWritten, gUnits)/(long double)gTotalWriteTransferTime.getTime();
+      long double writeIops = (long double)gTotalWriteOps/(long double)gTotalWriteTransferTime.getTime();
+      gLogger->note(device, "Total write transfer time (WTT): %17s\n", 
+                    gTotalWriteTransferTime.getElapsedTimeStr().c_str());
+      gLogger->note(device, "Total write transfer rate (WTR): %11.2Lf %-5s\n",
+                    writeTransferRate, getTransferRateUnitsStr(gUnits));
+      gLogger->note(device, "Total write IOPS:                %11.2Lf IOPS\n", writeIops);
+                    
+   }
+   if (gTotalBytesRead > 0)
       
-      {
-         long double readTransferRate = convertCapacity((long double)gTotalBytesRead, gUnits)/(long double)gTotalReadTransferTime.getTime();
-         gLogger->note(device, "Total read transfer time:  %17s\n", 
-                       gTotalReadTransferTime.getElapsedTimeStr().c_str());
-         gLogger->note(device, "Total read transfer rate:  %11.2Lf %-5s\n",
-                       readTransferRate, getTransferRateUnitsStr(gUnits));
-      }
+   {
+      long double readTransferRate = convertCapacity((long double)gTotalBytesRead, gUnits)/(long double)gTotalReadTransferTime.getTime();
+      long double readIops = (long double)gTotalReadOps/(long double)gTotalWriteTransferTime.getTime();
+      gLogger->note(device, "Total read transfer time (RTT):  %17s\n", 
+                    gTotalReadTransferTime.getElapsedTimeStr().c_str());
+      gLogger->note(device, "Total read transfer rate (RTR):  %11.2Lf %-5s\n",
+                    readTransferRate, getTransferRateUnitsStr(gUnits));
+      gLogger->note(device, "Total read IOPS:                 %11.2Lf IOPS\n", readIops);
    }
 }
 
@@ -1244,6 +1256,17 @@ void do_job(Job *job, unsigned int iteration, IoDirection_t ioDirection)
       break;
    case WRITING:
       gTotalWriteTransferTime = savedTotalWriteTransferTime + job->getJobEndTime() - job->getJobStartTime();
+      break;
+   }
+
+   // Update IOPS.
+   switch (ioDirection)
+   {
+   case READING:
+      gTotalReadOps += job->getTotalNumberOfTransfers(); 
+      break;
+   case WRITING:
+      gTotalWriteOps += job->getTotalNumberOfTransfers(); 
       break;
    }
 
