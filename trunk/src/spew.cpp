@@ -246,6 +246,10 @@ void help(poptContext &context)
 "                                    data. Available patterns are: none, \n"
 "                                    zeros, random, and numbers. The default\n"
 "                                    pattern is %s.\n"
+"  RCFILE                            Read additional command-line options\n"
+"                                    from RCFILE.  Other options on the\n"
+"                                    command-line will override options in\n"
+"                                    RCFILE.\n"
 "  SEED                              Used to seed the random number generator\n"
 "                                    Must be >= 1 and <= 2^32.\n"
 "  TRANSFER_SIZE                     Total number of bytes to transfer (must\n"
@@ -279,7 +283,7 @@ void help(poptContext &context)
 //////////////////////////  usage()  /////////////////////////////////////////
 void usage(poptContext &context)
 {
-   poptSetOtherOptionHelp(context, "[OPTION]... TRANSFER_SIZE[kKmMgG] FILE");
+   poptSetOtherOptionHelp(context, "TRANSFER_SIZE[kKmMgG] FILE");
    poptPrintUsage(context, stdout, 0);
 }
 
@@ -375,23 +379,56 @@ Units_t get_units(const char *arg)
 
 
 //////////////////////////  read_rcfile()  ///////////////////////////////////
-bool read_rcfile(poptContext &context)
+bool read_rcfile(poptContext &context, int argc, const char **argv)
 {
+
    string rcFilePath = "";
-   if (getenv(SPEWRC_ENV))
+   // Check the command-line for --rcfile.
+   for (int i = 1; i < argc; i++)
    {
-      rcFilePath = getenv(SPEWRC_ENV);
-   }
-   else
-   {
-      char *home = getenv("HOME");
-      if (home)
+      if (strncmp(argv[i], "--rcfile", 8) == 0)
       {
-         rcFilePath = home;
-         rcFilePath += "/";
-         rcFilePath += DEFAULT_SPEWRC_FILENAME;
+         char *eqPos = strrchr(argv[1], '=');
+         if (eqPos == (char *)NULL)
+         {
+            if (i + 1 < argc)
+            {
+               rcFilePath = argv[i+1];
+            }
+            else
+            {
+               error_msg("Missing RCFILE argument.\n");
+               return false;
+            }
+         }
+         else
+         {
+            rcFilePath = eqPos + 1;
+         }
+         break;
       }
    }
+
+   // Try default locations if no file specified on the command-line.
+   if (rcFilePath.length() == 0)
+   {
+
+      if (getenv(SPEWRC_ENV))
+      {
+         rcFilePath = getenv(SPEWRC_ENV);
+      }
+      else
+      {
+         char *home = getenv("HOME");
+         if (home)
+         {
+            rcFilePath = home;
+            rcFilePath += "/";
+            rcFilePath += DEFAULT_SPEWRC_FILENAME;
+         }
+      }
+   }
+
    if (rcFilePath.length() == 0)
       return true;  // No file to process.
 
@@ -448,6 +485,7 @@ bool parse_options(int argc, const char **argv)
    char *patternArgStr = (char *)NULL;
    char *unitsArgStr = (char *)NULL;
    char *logfilePathArgStr = (char *)NULL;
+   char *dummyArgStr = (char *)NULL;
    int writeArg = 0;
    int readArg = 0;
    int readAfterWriteArg = 0;
@@ -485,6 +523,7 @@ bool parse_options(int argc, const char **argv)
       {"no-statistics", 'q', POPT_ARG_NONE, &noStatisticsArg, 0, "Don't output statistics.", NULL},
       {"random", 'r', POPT_ARG_NONE, &randomArg, 0, "Read/Write buffers to random offsets.", NULL},
       {"raw", 0, POPT_ARG_NONE, &readAfterWriteArg, 0, "An alias for --read-after-write.", NULL},
+      {"rcfile", 0, POPT_ARG_STRING, &dummyArgStr, 0, "Read command-line options from RCFILE.", "RCFILE"},
       {"read", 0, POPT_ARG_NONE, &readArg, 0, "Read date from FILE.", NULL},
       {"read-after-write", 0, POPT_ARG_NONE, &readAfterWriteArg, 0, "Read back data after writing to FILE.", NULL},
       {"seed", 'S', POPT_ARG_LONG, &gSeed, 0, "Use SEED for random number seed.","SEED"},
@@ -506,7 +545,7 @@ bool parse_options(int argc, const char **argv)
                                         optionsTable, 
                                         POPT_CONTEXT_POSIXMEHARDER);
 
-   if (!read_rcfile(context))
+   if (!read_rcfile(context, argc, argv))
        return false;
 
    int rc = poptGetNextOpt(context);
@@ -674,11 +713,11 @@ bool parse_options(int argc, const char **argv)
 
    // Count the rest of the arguments.
    const char **argsLeft = poptGetArgs(context);
-   int argsCount;
+   int argsCount = 0;
    if (argsLeft)
    {
-      for (argsCount = 0;  argsLeft[argsCount] != NULL; argsCount++)
-         ;
+      while (argsLeft[argsCount] != NULL)
+         argsCount++;
    }
    if (argsCount < 2)
    {
@@ -957,8 +996,8 @@ void run_statistics(unsigned int iterations)
    unsigned int device;
    device = Log::OUTPUT_LOG_STDOUT;
    if (gVerbosity == VERBOSITY_LONG)
-      device |= Log::OUTPUT_DISPLAY_STDOUT;
    {
+      device |= Log::OUTPUT_DISPLAY_STDOUT;
       TimeHack now(TimeHack::getCurrentTime());
 
       if (!gUseTui)
@@ -1316,6 +1355,8 @@ int main(int argc, char *argv[])
          break;
       }
    }
+
+   
 
    if (!parse_options(argc, (const char **)argv))
    {
