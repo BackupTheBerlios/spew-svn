@@ -76,13 +76,14 @@ static const char *PROG_NAME_LOOKUP[] =
 {
    (char *)NULL,
    "spew",
-   "snarf",
+   "gorge",
    "regorge",
    (char *)NULL,
 
 };
 static const char SPEWRC_ENV[] = "SPEWRC";
 static const char DEFAULT_SPEWRC_FILENAME[] = ".spewrc";
+static const char SYSTEM_SPEWRC_FILENAME[] = "spew.conf";
 static const char PROG_VERSION[] = VERSION;
 static const int MAX_TMP_STR_LEN = 1024;
 static const unsigned int INDENT_SIZE = 4;
@@ -129,6 +130,7 @@ capacity_t gTransferSize = 0;
 string gFile = "";
 bool gUseTui = false;
 string gLogfilePath = "";
+bool gUseStdRcFiles = true;
 Log *gLogger = (Log *)NULL;
 capacity_t gJobId = 0;
 SpewDisplay *gDisplay = (SpewDisplay *)NULL; 
@@ -142,7 +144,6 @@ capacity_t gTotalReadOps = 0;
 TimeHack gProgramStartTime;
 unsigned int gFoundTransferErrors = 0;
 
-
 //////////////////////////////////////////////////////////////////////////////
 ////////////////////  Function Prototypes  ///////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -151,8 +152,6 @@ void note(char *fmt, ...);
 void usage();
 bool parse_options(int argc, const char **argv, string& cmdArgs);
 bool validate_options();
-void spew();
-void snarf();
 void end_program(int exitCode);
 void end_program(int exitCode, char *fmt, ...);
 void update_transfer_totals(const Job *job,
@@ -380,20 +379,105 @@ Units_t get_units(const char *arg)
 }
 
 
-//////////////////////////  read_rcfile()  ///////////////////////////////////
-bool read_rcfile(poptContext &context, 
-                 int argc, 
-                 const char **argv, 
-                 string& cmdArgs)
+//////////////////////////  parse_rcfile()  ///////////////////////////////////
+bool parse_rcfile(FILE *rcfile,
+                  string& cmdArgs)
 {
+   char rcArgs[MAX_TMP_STR_LEN];
+   int len;
+   while (fgets(rcArgs, MAX_TMP_STR_LEN, rcfile) != (char *)NULL)
+   {
+      // Chop off string after comment character.
+      char *commentStart = strchr(rcArgs, '#');
+      if (commentStart)
+         *commentStart = '\0';
+      len = strlen(rcArgs);
+      if (rcArgs[len - 1] == '\n')
+         rcArgs[len - 1] = '\0';
+      if (rcArgs[0] != '\0')
+      {
+         cmdArgs += rcArgs;
+         cmdArgs += " ";
+      }
+   }
+   return true;
+}
 
-   string rcFilePath = "";
+
+//////////////////////////  read_rcfiles()  ///////////////////////////////////
+bool read_rcfiles(int argc, const char **argv, string& cmdArgs)
+{
+   struct stat statbuf;
+   string rcFilePath;
+   vector<string> rcFilePaths;
+
+
+   // Check command-line for --no-rcfiles option.
+   for (int i = 0; i < argc; i++)
+   {
+      if (strncmp(argv[i], "--no-rcfiles", strlen("--no-rcfiles")) == 0)
+      {
+         gUseStdRcFiles = false;
+         break;
+      }
+   }
+
+   // Read standard config locations.
+   if (gUseStdRcFiles)
+   {
+      // Read system-wide rcfile if it exists.
+      rcFilePath = QUOTE(SYSCONFDIR);
+      rcFilePath += "/";
+      rcFilePath += SYSTEM_SPEWRC_FILENAME;
+      if (stat(rcFilePath.c_str(), &statbuf) >= 0)
+      {
+         rcFilePaths.push_back(rcFilePath);
+      }
+      else
+      {
+         if (errno != ENOENT)
+         {
+            error_msg("Cannot access rc file \"%s\" -- %s.\n", 
+                      rcFilePath.c_str(), strError(errno).c_str());
+         }
+      }
+
+      rcFilePath = "";
+      if (getenv(SPEWRC_ENV))
+      {
+         rcFilePath = getenv(SPEWRC_ENV);
+      }
+      else
+      {
+         char *home = getenv("HOME");
+         if (home)
+         {
+            rcFilePath = home;
+            rcFilePath += "/";
+            rcFilePath += DEFAULT_SPEWRC_FILENAME;
+         }
+      }
+      if (stat(rcFilePath.c_str(), &statbuf) >= 0)
+      {
+         rcFilePaths.push_back(rcFilePath);
+      }
+      else
+      {
+         if (errno != ENOENT)
+         {
+            error_msg("Cannot access rc file \"%s\" -- %s.\n", 
+                      rcFilePath.c_str(), strError(errno).c_str());
+         }
+      }
+   }
+
    // Check the command-line for --rcfile.
    for (int i = 1; i < argc; i++)
    {
+      rcFilePath = "";
       if (strncmp(argv[i], "--rcfile", 8) == 0)
       {
-         char *eqPos = strrchr(argv[1], '=');
+         char *eqPos = strrchr(argv[i], '=');
          if (eqPos == (char *)NULL)
          {
             if (i + 1 < argc)
@@ -410,75 +494,33 @@ bool read_rcfile(poptContext &context,
          {
             rcFilePath = eqPos + 1;
          }
+         if (stat(rcFilePath.c_str(), &statbuf) < 0)
+         {
+            error_msg("Cannot access RCFILE \"%s\" -- %s.\n", 
+                      rcFilePath.c_str(), strError(errno).c_str());
+            return false;
+         }
+         else
+            rcFilePaths.push_back(rcFilePath);
          break;
       }
    }
 
-   // Try default locations if no file specified on the command-line.
-   if (rcFilePath.length() == 0)
+   vector<string>::iterator pathIter;
+   for (pathIter = rcFilePaths.begin();
+        pathIter != rcFilePaths.end();
+        pathIter++)
    {
-
-      if (getenv(SPEWRC_ENV))
-      {
-         rcFilePath = getenv(SPEWRC_ENV);
-      }
-      else
-      {
-         char *home = getenv("HOME");
-         if (home)
-         {
-            rcFilePath = home;
-            rcFilePath += "/";
-            rcFilePath += DEFAULT_SPEWRC_FILENAME;
-         }
-      }
-   }
-
-   if (rcFilePath.length() == 0)
-      return true;  // No file to process.
-
-   FILE *rcfile = (FILE *)NULL;
-   struct stat statbuf;
-   if (stat(rcFilePath.c_str(), &statbuf) >= 0)
-   {
-      rcfile = fopen(rcFilePath.c_str(), "r");
+      FILE *rcfile = fopen(pathIter->c_str(), "r");
       if (rcfile == (FILE *)NULL)
       {
          error_msg("Cannot open rc file \"%s\" -- %s.\n", 
-                   rcFilePath.c_str(), strError(errno).c_str());
-         return false;
+                   pathIter->c_str(), strError(errno).c_str());
       }
-   }
-   else
-   {
-      if (errno == ENOENT)
-         return true; // File does not exist.
       else
       {
-         error_msg("Cannot access rc file \"%s\" -- %s.\n", 
-                   rcFilePath.c_str(), strError(errno).c_str());
-         return false;
-      }
-   }
-
-   char rcArgs[MAX_TMP_STR_LEN];
-   int newArgc;
-   const char **newArgv;
-   int len;
-   while (fgets(rcArgs, MAX_TMP_STR_LEN, rcfile) != (char *)NULL)
-   {
-      len = strlen(rcArgs);
-      if (rcArgs[len - 1] == '\n')
-         rcArgs[len - 1] = '\0';
-      if (rcArgs[0] != '\0')
-      {
-         poptParseArgvString(rcArgs, &newArgc, &newArgv);
-         poptStuffArgs(context, newArgv);
-         for (int i = 0; i < newArgc; i++)
-         {
-            cmdArgs += newArgv[i];
-            cmdArgs += " ";
-         }
+         parse_rcfile(rcfile, cmdArgs);
+         fclose(rcfile);
       }
    }
 
@@ -513,6 +555,7 @@ bool parse_options(int argc, const char **argv, string& cmdArgs)
    int directArg = 0;
    int randomArg = 0;
    int generateLoadArg = 0;
+   int useStdRcFilesArg = 1;
 
    struct poptOption optionsTable[] =  {
       {"max-buffer-size", 'B', POPT_ARG_STRING, &maxBufferSizeArgStr, 0, "Each read(2)/write(2) call uses a maximum buffer of size BUFFER_SIZE.", "BUFFER_SIZE"},
@@ -525,11 +568,12 @@ bool parse_options(int argc, const char **argv, string& cmdArgs)
       {"iterations", 'i', POPT_ARG_INT, &iterationsArg, 0, "Write/read data COUNT times. If count is 0, repeats forever.", "COUNT"},
       {"logfile", 'l', POPT_ARG_STRING, &logfilePathArgStr, 0, "Send log messages to LOGFILE.", "LOGFILE"},
       {"no-progress", 0, POPT_ARG_NONE, &noProgressArg, 0, "Don't show progess (default).", NULL},
+      {"no-rcfiles", 0, POPT_ARG_NONE, NULL, 0, "Don't use standard rcfiles.", NULL},
+      {"no-statistics", 'q', POPT_ARG_NONE, &noStatisticsArg, 0, "Don't output statistics.", NULL},
       {"no-tui", 0, POPT_ARG_NONE, &noTuiArg, 0, "Don't use TUI interface.", NULL},
       {"offset", 'o', POPT_ARG_STRING, &offsetArgStr, 0, "Seek to OFFSET before starting I/O.", "OFFSET"},
       {"progress", 'P', POPT_ARG_NONE, &progressArg, 0, "Show progess.", NULL},
       {"pattern", 'p', POPT_ARG_STRING, &patternArgStr, 0, "Use data pattern PATTERN when reading or writing data.", "PATTERN"},
-      {"no-statistics", 'q', POPT_ARG_NONE, &noStatisticsArg, 0, "Don't output statistics.", NULL},
       {"random", 'r', POPT_ARG_NONE, &randomArg, 0, "Read/Write buffers to random offsets.", NULL},
       {"raw", 0, POPT_ARG_NONE, &readAfterWriteArg, 0, "An alias for --read-after-write.", NULL},
       {"rcfile", 0, POPT_ARG_STRING, &dummyArgStr, 0, "Read command-line options from RCFILE.", "RCFILE"},
@@ -548,20 +592,24 @@ bool parse_options(int argc, const char **argv, string& cmdArgs)
       POPT_TABLEEND
    };
 
-   poptContext context = poptGetContext(gPrgName,
-                                        argc, 
-                                        argv, 
-                                        optionsTable, 
-                                        POPT_CONTEXT_POSIXMEHARDER);
-
    cmdArgs = "";
-   if (!read_rcfile(context, argc, argv, cmdArgs))
+   if (!read_rcfiles(argc, argv, cmdArgs))
        return false;
    for (int i = 1; i < argc; i++)
    {
       cmdArgs += argv[i];
       cmdArgs += " ";
    }
+   cmdArgs = " " + cmdArgs;
+   cmdArgs = argv[0] + cmdArgs;
+   int newArgc;
+   const char **newArgv;
+   poptParseArgvString((char *)cmdArgs.c_str(), &newArgc, &newArgv);
+   poptContext context = poptGetContext(gPrgName,
+                                        newArgc, 
+                                        newArgv, 
+                                        optionsTable, 
+                                        POPT_CONTEXT_POSIXMEHARDER);
 
    int rc = poptGetNextOpt(context);
    if (rc < -1)
@@ -1435,7 +1483,7 @@ int main(int argc, char *argv[])
    gDisplay->setCurrentUnits(gUnits);
    gProgramStartTime = TimeHack::getCurrentTime();
    gLogger->logStart();
-   gLogger->logCmdLine(prgBasename, cmdArgs.c_str());
+   gLogger->logCmdLine(cmdArgs.c_str());
    gLogger->logNote("\n");
    gDisplay->startRun();
 

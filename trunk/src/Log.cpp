@@ -259,7 +259,7 @@ void Log::logFinish() const
 
 
 //////////////////////////  Log::logCmdLine()  ///////////////////////////////
-void Log::logCmdLine(const char *cmd, const char *args) const
+void Log::logCmdLine(const char *args) const
 {
    if (!mLogStderrFile)
       return;
@@ -267,9 +267,7 @@ void Log::logCmdLine(const char *cmd, const char *args) const
    const char *indent = "              ";
    const char *follower = "\\";
 
-   string msg = cmd;
-   msg += " ";
-   msg += args;
+   string msg = args;
    this->justify(msg, leader, indent, follower);
 
    fprintf(mLogStdoutFile, "%s\n", msg.c_str());

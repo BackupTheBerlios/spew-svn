@@ -5,7 +5,7 @@ This is the Spew FAQ.  Any suggestions/corrections/etc should be
 directed to andrew.patterson@hp.com.  The FAQ answers the following questions:
 
     1) How do I get direct I/O working on RedHat Advanced Server 2.1?
-    2) Who came up with the names "Spew" and "Snarf"?
+    2) Who came up with the names "Spew"?
 
 
  1) How do I get direct I/O working on RedHat Advanced Server 2.1?
@@ -25,7 +25,7 @@ directed to andrew.patterson@hp.com.  The FAQ answers the following questions:
  
  struct file_operations def_blk_fops = {
 
-  2) Who came up with the names "Spew" and "Snarf"?
+  2) Who came up with the name "Spew"?
 
      Larry Fenske was the author of the original 20-line C version of Spew. 
-     He also originated the names.  
+     He also originated the name.  

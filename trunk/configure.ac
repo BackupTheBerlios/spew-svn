@@ -56,7 +56,6 @@ if test "$mnttab" = yes; then
 AC_CHECK_FUNC([getmntent],AC_DEFINE(HAVE_MOUNT_CHECK,[1],Define to 1 if getmntent can be used to get mounted file systems.),,)
 fi
 
-
 # Get typedefs for 32 and 64 bit unsigned integers.
 AC_CHECK_SIZEOF(unsigned int)
 AC_CHECK_SIZEOF(unsigned long)
@@ -106,5 +105,7 @@ if test "x$static_spew" = "xyes" ; then
 fi
 AC_SUBST(STATIC_LINK)
 
-AC_CONFIG_FILES([src/Makefile man/Makefile])
+CXXFLAGS="$CXXFLAGS -DSYSCONFDIR=${sysconfdir}"
+
+AC_CONFIG_FILES([src/Makefile man/Makefile etc/Makefile])
 AC_OUTPUT(Makefile)

@@ -54,7 +54,7 @@ public:
    void logError(const char *fmt, ...) const;
    void logStart() const;
    void logFinish() const;
-   void logCmdLine(const char *cmd, const char *) const;
+   void logCmdLine(const char *args) const;
    
    ~Log();
 
@@ -62,16 +62,10 @@ private:
    Log(const Log&); // Hide copy constructor.
    
    void logSeparatorNote(const char *timestamp, const char *note) const;
-   string& justify(string& str) const { return justify(str, "", ""); };
    string& justify(string& str, 
-                   const string& leader) const { return justify(str, leader, ""); };
-   string& justify(string& str, 
-                   const string& leader, 
-                   const string &hangingIndent) const;
-   string& justify(string& str, 
-                   const string& leader, 
-                   const string &hangingIndent,
-                   const string &follower) const;
+                   const string& leader = "", 
+                   const string &hangingIndent = "",
+                   const string &follower = "") const;
    char *timestamp(char *timestamp) const;
 
 protected:
