@@ -149,7 +149,7 @@ unsigned int gFoundTransferErrors = 0;
 void error_msg(char *fmt, ...);
 void note(char *fmt, ...);
 void usage();
-bool parse_options(int argc, const char **argv);
+bool parse_options(int argc, const char **argv, string& cmdArgs);
 bool validate_options();
 void spew();
 void snarf();
@@ -381,7 +381,10 @@ Units_t get_units(const char *arg)
 
 
 //////////////////////////  read_rcfile()  ///////////////////////////////////
-bool read_rcfile(poptContext &context, int argc, const char **argv)
+bool read_rcfile(poptContext &context, 
+                 int argc, 
+                 const char **argv, 
+                 string& cmdArgs)
 {
 
    string rcFilePath = "";
@@ -471,6 +474,11 @@ bool read_rcfile(poptContext &context, int argc, const char **argv)
       {
          poptParseArgvString(rcArgs, &newArgc, &newArgv);
          poptStuffArgs(context, newArgv);
+         for (int i = 0; i < newArgc; i++)
+         {
+            cmdArgs += newArgv[i];
+            cmdArgs += " ";
+         }
       }
    }
 
@@ -479,7 +487,7 @@ bool read_rcfile(poptContext &context, int argc, const char **argv)
 
 
 //////////////////////////  parse_options()  /////////////////////////////////
-bool parse_options(int argc, const char **argv)
+bool parse_options(int argc, const char **argv, string& cmdArgs)
 {
    char *minBufferSizeArgStr = (char *)NULL;
    char *maxBufferSizeArgStr = (char *)NULL;
@@ -505,7 +513,6 @@ bool parse_options(int argc, const char **argv)
    int directArg = 0;
    int randomArg = 0;
    int generateLoadArg = 0;
-
 
    struct poptOption optionsTable[] =  {
       {"max-buffer-size", 'B', POPT_ARG_STRING, &maxBufferSizeArgStr, 0, "Each read(2)/write(2) call uses a maximum buffer of size BUFFER_SIZE.", "BUFFER_SIZE"},
@@ -547,8 +554,14 @@ bool parse_options(int argc, const char **argv)
                                         optionsTable, 
                                         POPT_CONTEXT_POSIXMEHARDER);
 
-   if (!read_rcfile(context, argc, argv))
+   cmdArgs = "";
+   if (!read_rcfile(context, argc, argv, cmdArgs))
        return false;
+   for (int i = 1; i < argc; i++)
+   {
+      cmdArgs += argv[i];
+      cmdArgs += " ";
+   }
 
    int rc = poptGetNextOpt(context);
    if (rc < -1)
@@ -1369,6 +1382,7 @@ int main(int argc, char *argv[])
    // Process command-line options.
    gPrgName = argv[0];
    const char *prgBasename = basename(gPrgName);
+   string cmdArgs;
    
    for (int i = 1; PROG_NAME_LOOKUP[i] != (char *)NULL; i++)
    {
@@ -1379,9 +1393,7 @@ int main(int argc, char *argv[])
       }
    }
 
-   
-
-   if (!parse_options(argc, (const char **)argv))
+   if (!parse_options(argc, (const char **)argv, cmdArgs))
    {
       exit(EXIT_ERROR_USAGE);
    }
@@ -1423,7 +1435,7 @@ int main(int argc, char *argv[])
    gDisplay->setCurrentUnits(gUnits);
    gProgramStartTime = TimeHack::getCurrentTime();
    gLogger->logStart();
-   gLogger->logCmdLine(argc, argv);
+   gLogger->logCmdLine(prgBasename, cmdArgs.c_str());
    gLogger->logNote("\n");
    gDisplay->startRun();
 
