@@ -1,4 +1,4 @@
-// <!-- 451235096
+// 451235096
 // This script is (C) Copyright 2004 Jim Tucek
 // Leave these comments alone!  For more info, visit
 // www.jracademy.com/~jtucek/email/ 
@@ -54,4 +54,3 @@ genetics = (law*genetics) % energy;
 }
 return genetics;
 }
-// -->
