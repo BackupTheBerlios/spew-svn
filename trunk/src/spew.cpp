@@ -1090,7 +1090,7 @@ void run_statistics(unsigned int iterations)
       
    {
       long double readTransferRate = convertCapacity((long double)gTotalBytesRead, gUnits)/(long double)gTotalReadTransferTime.getTime();
-      long double readIops = (long double)gTotalReadOps/(long double)gTotalWriteTransferTime.getTime();
+      long double readIops = (long double)gTotalReadOps/(long double)gTotalReadTransferTime.getTime();
       gLogger->note(device, "Total read transfer time (RTT):  %17s\n", 
                     gTotalReadTransferTime.getElapsedTimeStr().c_str());
       gLogger->note(device, "Total read transfer rate (RTR):  %11.2Lf %-5s\n",
