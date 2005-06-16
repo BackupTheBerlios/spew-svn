@@ -28,6 +28,7 @@ AC_PROG_LN_S
 # Checks for libraries.
 AC_CHECK_LIB(popt, poptGetContext, ,AC_MSG_ERROR([PACKAGE] requires popt))
 AC_CHECK_LIB(ncurses, wresize, ,AC_MSG_ERROR([PACKAGE] requires ncurses))
+AC_CHECK_LIB(pthread, pthread_create,pthreads_available=yes,pthreads_available=no)
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -87,13 +88,14 @@ AC_CHECK_FUNCS([getpagesize gettimeofday memset strerror strsignal strrchr local
 
 # Add --enable-static
 AC_ARG_ENABLE(static-link,
-	[  --enable-static-link         link spew statically],
+	[  --enable-static-link	link spew statically],
 	[ case "$enableval" in
           yes) static_spew=yes ;;
           no) static_spew=no;;
           esac
         ],
 	static_spew=no)
+
 
 STATIC_LINK=""
 if test "x$static_spew" = "xyes" ; then
@@ -104,6 +106,23 @@ if test "x$static_spew" = "xyes" ; then
   fi
 fi
 AC_SUBST(STATIC_LINK)
+
+# Add --disable-threads
+AC_ARG_ENABLE(threads,
+	[  --disable-threads	do not use threads],
+	[
+	  if test "x$enableval" = "xyes" -a "x$pthreads_available" = "xyes"
+	  then
+		AC_DEFINE(USE_THREADS, [1], Use threads)
+	  fi
+        ],
+	[
+	if test "x$pthreads_available" = "xyes"; then
+		AC_DEFINE(USE_THREADS, [1], Use threads)
+	fi
+	]
+	)
+	
 
 CXXFLAGS="$CXXFLAGS -DSYSCONFDIR=${sysconfdir}"
 
