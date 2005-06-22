@@ -72,10 +72,7 @@ Job::Job(Log &logger,
    mRealBuffer = (unsigned char *)NULL;
    mBuffer = (unsigned char *)NULL;
    mLastErrorMsg = "";
-   mJobBytesTransferred = 0;
-   mHackBytesTransferred = 0;
    mRunningHack = false;
-   mNumTransfersWithDataIntegrityErrors = 0;
 }
 
 
@@ -93,6 +90,14 @@ int Job::init()
       return EXIT_ERROR_MEMORY_ALLOC;
    }
    mBuffer = PTR_ALIGN(mRealBuffer, pageSize);
+
+	// Initialize statistics.
+	mStats = new JobStatistics();
+   if (!mStats)
+   {
+      mLastErrorMsg = "Cannot allocate memory.\n";
+      return EXIT_ERROR_MEMORY_ALLOC;
+   }
 
    // Initialize the list of transfers.
    mTransferInfoList = TransferInfoListFactory::createInstance(
@@ -129,7 +134,7 @@ capacity_t Job::getTotalNumberOfTransfers() const
 /////////////////////////  Job::startJob()  ///////////////////////////////////
 int Job::startJob()
 {
-   mJobBytesTransferred = 0;
+   mStats->setJobBytesTransferred(0);
    return EXIT_OK;
 }
 
@@ -151,28 +156,28 @@ int Job::finishJob()
 /////////////////////////  Job::setJobStartTime()  ////////////////////////////
 void Job::setJobStartTime()
 {
-   mJobStartTime.setTimeNow();}
-
+   mStats->setJobStartTime();
+}
 
 
 /////////////////////////  Job::getJobStartTime()  ////////////////////////////
 TimeHack::timehack_t Job::getJobStartTime() const
 {
-   return mJobStartTime.getTime();
+   return mStats->getJobStartTime().getTime();
 }
 
 
 /////////////////////////  Job::setJobEndTime()  //////////////////////////////
 void Job::setJobEndTime()
 {
-   mJobEndTime.setTimeNow();
+   mStats->setJobEndTime();
 }
 
 
 /////////////////////////  Job::getJobEndTime()  //////////////////////////////
 TimeHack::timehack_t Job::getJobEndTime() const
 {
-   return mJobEndTime.getTime();
+   return mStats->getJobEndTime().getTime();
 }
 
 
@@ -186,35 +191,35 @@ TimeHack::timehack_t Job::getJobElapsedTime() const
 /////////////////////////  Job::getTotalJobTime()  ////////////////////////////
 TimeHack::timehack_t Job::getTotalJobTime() const
 {
-   return mJobEndTime.getTime() - mJobStartTime.getTime();
+   return mStats->getJobEndTime().getTime() - mStats->getJobStartTime().getTime();
 }
 
 
 /////////////////////////  Job::setHackStartTime()  ///////////////////////////
 void Job::setHackStartTime()
 {
-   mHackStartTime.setTimeNow();
+   mStats->setHackStartTime();
 }
 
 
 ////////////////////////  Job::getHackStartTime()  ////////////////////////////
 TimeHack::timehack_t Job::getHackStartTime() const
 {
-   return mHackStartTime.getTime();
+   return mStats->getHackStartTime().getTime();
 }
 
 
 /////////////////////////  Job::setHackEndTime()  /////////////////////////////
 void Job::setHackEndTime()
 {
-   mHackEndTime.setTimeNow();
+   mStats->setHackEndTime();
 }
 
 
 /////////////////////////  Job::getHackEndTime()  /////////////////////////////
 TimeHack::timehack_t Job::getHackEndTime() const
 {
-   return mHackEndTime.getTime();
+   return mStats->getHackEndTime().getTime();
 }
 
 
@@ -229,7 +234,7 @@ TimeHack::timehack_t Job::getHackElapsedTime() const
 /////////////////////////  Job::getTotalHackTime()  ///////////////////////////
 TimeHack::timehack_t Job::getTotalHackTime() const
 {
-   return mHackEndTime.getTime() - mHackStartTime.getTime();
+   return mStats->getHackEndTime().getTime() - mStats->getHackStartTime().getTime();
 }
 
 
@@ -237,7 +242,7 @@ TimeHack::timehack_t Job::getTotalHackTime() const
 int Job::startHack()
 {
    mRunningHack = true;
-   mHackBytesTransferred = 0LLU;
+   mStats->setHackBytesTransferred(0);
    this->setHackStartTime();
 
    return EXIT_OK;
@@ -257,28 +262,28 @@ int Job::endHack()
 /////////////////////////  Job::setTransferStartTime()  ///////////////////////
 void Job::setTransferStartTime()
 {
-   mTransferStartTime.setTimeNow();
+   mStats->setTransferStartTime();
 }
 
 
 ////////////////////////  Job::getTransferStartTime()  ////////////////////////
 TimeHack::timehack_t Job::getTransferStartTime() const
 {
-   return mTransferStartTime.getTime();
+   return mStats->getTransferStartTime().getTime();
 }
 
 
 /////////////////////////  Job::setTransferEndTime()  /////////////////////////
 void Job::setTransferEndTime()
 {
-   mTransferEndTime.setTimeNow();
+   mStats->setTransferEndTime();
 }
 
 
 /////////////////////////  Job::getTransferEndTime()  /////////////////////////
 TimeHack::timehack_t Job::getTransferEndTime() const
 {
-   return mTransferEndTime.getTime();
+   return mStats->getTransferEndTime().getTime();
 }
 
 
@@ -292,5 +297,6 @@ Job::~Job()
       mBuffer = (unsigned char*)NULL;
    }
    delete mTransfer;
+	delete mStats;
    delete mTransferInfoList;
 }

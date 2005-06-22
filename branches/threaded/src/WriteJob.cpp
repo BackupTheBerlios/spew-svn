@@ -111,7 +111,7 @@ int WriteJob::startJob()
       return EXIT_ERROR_MEMORY_ALLOC;
    }
 
-   mJobBytesTransferred = 0;
+   mStats->setJobBytesTransferred(0);
    this->setJobStartTime();
 
    return EXIT_OK;
@@ -137,7 +137,7 @@ int WriteJob::runTransfers(capacity_t numTransfers, bool continueAfterError)
    // writes, so it is ignored.
 
    this->setTransferStartTime();
-   mBytesTransferred = 0;
+   mStats->setTransferBytesTransferred(0);
    int exitCode = EXIT_OK;
    for (capacity_t i = 0; i < numTransfers; i++)
    {
@@ -151,10 +151,10 @@ int WriteJob::runTransfers(capacity_t numTransfers, bool continueAfterError)
       capacity_t transferSize = nextTransfer->getSize();
       if (ret == EXIT_OK)
       {
-         mBytesTransferred += transferSize;
-         mJobBytesTransferred += transferSize;
+         mStats->setJobBytesTransferred(mStats->getJobBytesTransferred() + transferSize);
+         mStats->setTransferBytesTransferred(mStats->getTransferBytesTransferred() + transferSize);
          if (mRunningHack)
-            mHackBytesTransferred += transferSize;
+				mStats->setHackBytesTransferred(mStats->getHackBytesTransferred() + transferSize);
       }
       else
       {

@@ -134,7 +134,7 @@ int ReadJob::runTransfers(capacity_t numTransfers, bool continueAfterError)
 {
 
    this->setTransferStartTime();
-   mBytesTransferred = 0;
+   mStats->setTransferBytesTransferred(0);
    int exitCode = EXIT_OK;
    for (capacity_t i = 0LLU; i < numTransfers; i++)
    {
@@ -149,16 +149,16 @@ int ReadJob::runTransfers(capacity_t numTransfers, bool continueAfterError)
       switch (ret)
       {
       case EXIT_OK:
-         mJobBytesTransferred += transferSize;
-         mBytesTransferred += transferSize;
+         mStats->setJobBytesTransferred(mStats->getJobBytesTransferred() + transferSize);
+         mStats->setTransferBytesTransferred(mStats->getTransferBytesTransferred() + transferSize);
          if (mRunningHack)
-            mHackBytesTransferred += transferSize;
+				mStats->setHackBytesTransferred(mStats->getHackBytesTransferred() + transferSize);
          break;
       case EXIT_ERROR_DATA_INTEGRITY:
          exitCode = EXIT_ERROR_DATA_INTEGRITY;
          if (continueAfterError)
          {
-            mNumTransfersWithDataIntegrityErrors++;
+            mStats->setNumTransfersWithDataIntegrityErrors(mStats->getNumTransfersWithDataIntegrityErrors() + 1);
             mLogger.logError(mLastErrorMsg.c_str());
          }
          else
@@ -174,7 +174,7 @@ int ReadJob::runTransfers(capacity_t numTransfers, bool continueAfterError)
       }
    }
    this->setTransferEndTime();
-   if (mNumTransfersWithDataIntegrityErrors)
+   if (mStats->getNumTransfersWithDataIntegrityErrors())
       return EXIT_ERROR_DATA_INTEGRITY;
    else
       return exitCode;

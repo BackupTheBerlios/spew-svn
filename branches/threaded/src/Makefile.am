@@ -19,7 +19,10 @@ libcommon_a_SOURCES = \
 	TransferInfoList.cpp TransferInfoList.h \
 	TransferInfoListFactory.cpp TransferInfoListFactory.h \
 	RandomTransferInfoList.cpp RandomTransferInfoList.h \
-	SequentialTransferInfoList.cpp SequentialTransferInfoList.h
+	SequentialTransferInfoList.cpp SequentialTransferInfoList.h \
+	Statistics.cpp Statistics.h \
+	CumulativeStatistics.cpp CumulativeStatistics.h \
+	JobStatistics.cpp JobStatistics.h 
 
 libtui_a_SOURCES = \
         Tui.cpp Tui.h
