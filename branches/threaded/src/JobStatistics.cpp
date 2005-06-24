@@ -33,9 +33,16 @@ using namespace std;
 //////////////////////////  JobStatistics::JobStatistics()  ///////////////////
 JobStatistics::JobStatistics()
 {
-	mJobBytesTransferred = 0;
-	mHackBytesTransferred = 0;
-	mTransferBytesTransferred = 0;
+   this->init();
+}
+
+
+//////////////////////////  JobStatistics::init()  ////////////////////////////
+void JobStatistics::init()
+{
+   mJobBytesTransferred = 0;
+   mHackBytesTransferred = 0;
+   mTransferBytesTransferred = 0;
    mNumTransfersWithDataIntegrityErrors = 0;
 }
 

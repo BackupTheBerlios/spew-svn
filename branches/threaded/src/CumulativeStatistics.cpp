@@ -1,6 +1,6 @@
 //////////////////////////  -*-C++-*- /////////////////////////////////////////
 //
-// JobStatistics.cpp
+// CumulativeStatistics.cpp
 //
 // Spew
 //
@@ -27,17 +27,17 @@ using namespace std;
 #endif
 
 #include "common.h"
-#include "JobStatistics.h"
+#include "CumulativeStatistics.h"
 
 
-//////////////////////////  JobStatistics::JobStatistics()  ///////////////////
-JobStatistics::JobStatistics()
+///////////////  CumulativeStatistics::CumulativeStatistics()  ////////////////
+CumulativeStatistics::CumulativeStatistics()
 {
 }
 
 
-//////////////////////////  JobStatistics::~JobStatistics()  //////////////////
-JobStatistics::~JobStatistics()
+////////////////  CumulativeStatistics::~CumulativeStatistics()  //////////////
+CumulativeStatistics::~CumulativeStatistics()
 {
 }
 

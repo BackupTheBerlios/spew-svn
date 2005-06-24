@@ -134,7 +134,7 @@ capacity_t Job::getTotalNumberOfTransfers() const
 /////////////////////////  Job::startJob()  ///////////////////////////////////
 int Job::startJob()
 {
-   mStats->setJobBytesTransferred(0);
+   mStats->init();
    return EXIT_OK;
 }
 

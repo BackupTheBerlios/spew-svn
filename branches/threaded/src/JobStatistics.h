@@ -35,52 +35,58 @@ class JobStatistics: public Statistics
 {
 public:
    JobStatistics();
-	
-	TimeHack getJobStartTime() const { return mJobStartTime; };
-	void setJobStartTime() { mJobStartTime.setTimeNow(); };
-	TimeHack getJobEndTime() const { return mJobEndTime; };
-	void setJobEndTime() { mJobEndTime.setTimeNow(); };
-	capacity_t getJobBytesTransferred() const { return mJobBytesTransferred; };
-	void setJobBytesTransferred(capacity_t bytes) { mJobBytesTransferred = bytes; };
 
-	TimeHack getHackStartTime() const { return mHackStartTime; };
-	void setHackStartTime() { mHackStartTime.setTimeNow(); };
-	TimeHack getHackEndTime() const { return mHackEndTime; };
-	void setHackEndTime() { mHackEndTime.setTimeNow(); };
-	capacity_t getHackBytesTransferred() const { return mHackBytesTransferred; };
-	void setHackBytesTransferred(capacity_t bytes) { mHackBytesTransferred = bytes; };
+   void init();
+   
+   TimeHack getJobStartTime() const { return mJobStartTime; };
+   void setJobStartTime() { mJobStartTime.setTimeNow(); };
+   TimeHack getJobEndTime() const { return mJobEndTime; };
+   void setJobEndTime() { mJobEndTime.setTimeNow(); };
+   capacity_t getJobBytesTransferred() const { return mJobBytesTransferred; };
+   void setJobBytesTransferred(capacity_t bytes) { mJobBytesTransferred = bytes; };
+   void addToJobBytesTransferred(capacity_t bytes) { mJobBytesTransferred += bytes; };
 
-	TimeHack getTransferStartTime() const { return mTransferStartTime; };
-	void setTransferStartTime() { mTransferStartTime.setTimeNow(); };
-	TimeHack getTransferEndTime() const { return mTransferEndTime; };
-	void setTransferEndTime() { mTransferEndTime.setTimeNow(); };
-	capacity_t getTransferBytesTransferred() const { return mTransferBytesTransferred; };
-	void setTransferBytesTransferred(capacity_t bytes) { mTransferBytesTransferred = bytes; };
+   TimeHack getHackStartTime() const { return mHackStartTime; };
+   void setHackStartTime() { mHackStartTime.setTimeNow(); };
+   TimeHack getHackEndTime() const { return mHackEndTime; };
+   void setHackEndTime() { mHackEndTime.setTimeNow(); };
+   capacity_t getHackBytesTransferred() const { return mHackBytesTransferred; };
+   void setHackBytesTransferred(capacity_t bytes) { mHackBytesTransferred = bytes; };
+   void addToHackBytesTransferred(capacity_t bytes) { mHackBytesTransferred += bytes; };
+
+   TimeHack getTransferStartTime() const { return mTransferStartTime; };
+   void setTransferStartTime() { mTransferStartTime.setTimeNow(); };
+   TimeHack getTransferEndTime() const { return mTransferEndTime; };
+   void setTransferEndTime() { mTransferEndTime.setTimeNow(); };
+   capacity_t getTransferBytesTransferred() const { return mTransferBytesTransferred; };
+   void setTransferBytesTransferred(capacity_t bytes) { mTransferBytesTransferred = bytes; };
+   void addToTransferBytesTransferred(capacity_t bytes) { mTransferBytesTransferred += bytes; };
 
 
-	capacity_t getNumTransfersWithDataIntegrityErrors() const { return mNumTransfersWithDataIntegrityErrors; };
-	void setNumTransfersWithDataIntegrityErrors(capacity_t errors) { mNumTransfersWithDataIntegrityErrors = errors; };
+   capacity_t getNumTransfersWithDataIntegrityErrors() const { return mNumTransfersWithDataIntegrityErrors; };
+   void setNumTransfersWithDataIntegrityErrors(capacity_t errors) { mNumTransfersWithDataIntegrityErrors = errors; };
+   void incNumTransfersWithDataIntegrityErrors() { mNumTransfersWithDataIntegrityErrors++; };
 
    virtual ~JobStatistics();
 
 private:
    JobStatistics(const JobStatistics& stats);
-	JobStatistics& operator=(const JobStatistics &rhs);
+   JobStatistics& operator=(const JobStatistics &rhs);
 
 private:
-	TimeHack mJobStartTime;
-	TimeHack mJobEndTime;
-	capacity_t mJobBytesTransferred;
+   TimeHack mJobStartTime;
+   TimeHack mJobEndTime;
+   capacity_t mJobBytesTransferred;
 
-	TimeHack mHackStartTime;
-	TimeHack mHackEndTime;
-	capacity_t mHackBytesTransferred;
+   TimeHack mHackStartTime;
+   TimeHack mHackEndTime;
+   capacity_t mHackBytesTransferred;
 
-	TimeHack mTransferStartTime;
-	TimeHack mTransferEndTime;
-	capacity_t mTransferBytesTransferred;
+   TimeHack mTransferStartTime;
+   TimeHack mTransferEndTime;
+   capacity_t mTransferBytesTransferred;
 
-	capacity_t mNumTransfersWithDataIntegrityErrors; // Number of transfers
+   capacity_t mNumTransfersWithDataIntegrityErrors; // Number of transfers
                                                     // with any number of data 
                                                     // integrity errors.
 };
