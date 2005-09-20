@@ -34,7 +34,6 @@ case $arch in
       libs="-ldl"
       ;;
     linux-parisc64)
-      libs="-ldl"
       ;;
     cygwinnt-ia32)
       TAR=zip
