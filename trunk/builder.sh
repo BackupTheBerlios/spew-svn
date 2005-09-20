@@ -1,5 +1,4 @@
 #!/bin/sh
-set -x
 
 if [ $# -lt 1 ]
 then
