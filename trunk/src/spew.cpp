@@ -987,31 +987,17 @@ void update_transfer_totals(const Job *job,
 void intermediate_statistics(const Job *job, 
                              IoDirection_t ioDirection)
 {
-   capacity_t totalBytesRead = gTotalBytesRead;
-   TimeHack totalReadTransferTime(gTotalReadTransferTime);
-   capacity_t totalBytesWritten = gTotalBytesWritten;
-   TimeHack totalWriteTransferTime(gTotalWriteTransferTime);
    TimeHack currentTime(TimeHack::getCurrentTime());
-   switch (ioDirection)
-   {
-   case READING:
-      totalBytesRead += job->getJobBytesTransferred();
-      totalReadTransferTime += currentTime - job->getJobStartTime();
-      break;
-   case WRITING:
-      totalBytesWritten += job->getJobBytesTransferred();
-      totalWriteTransferTime += currentTime - job->getJobStartTime();
-      break;
-   }
+
    gDisplay->intermediateStatistics(job->getHackBytesTransferred(),
                                     job->getHackEndTime() - job->getHackStartTime(),
                                     job->getJobBytesTransferred(),
                                     currentTime - job->getJobStartTime(),
                                     job->getTransferSize(),
-                                    totalBytesRead,
-                                    totalReadTransferTime.getTime(),
-                                    totalBytesWritten,
-                                    totalWriteTransferTime.getTime(), 
+                                    gTotalBytesRead,
+                                    gTotalReadTransferTime.getTime(),
+                                    gTotalBytesWritten,
+                                    gTotalWriteTransferTime.getTime(), 
                                     currentTime - gProgramStartTime);
 }
 
