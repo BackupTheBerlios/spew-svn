@@ -139,7 +139,7 @@ protected:
    capacity_t mJobId;  
 
 protected:
-	JobStatistics *mStats;
+   JobStatistics *mStats;
    TransferInfoList *mTransferInfoList;  
 
 };

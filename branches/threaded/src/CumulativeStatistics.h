@@ -35,39 +35,52 @@ class CumulativeStatistics: public Statistics
 {
 public:
    CumulativeStatistics();
-	
-	unsigned int getCurrentIteration() { return mCurrentIteration; };
-	void setCurrentIteration(unsigned int iter) { mCurrentIteration = iter; };
-	
-	TimeHack getTotalReadTransferTime() { return mTotalReadTransferTime; };
-	void setTotalReadTransferTime(const TimeHack &hack) { mTotalReadTransferTime = hack; };
-	TimeHack getTotalWriteTransferTime() { return mTotalWriteTransferTime; };
-	void setTotalWriteTransferTime(const TimeHack &hack) { mTotalWriteTransferTime = hack; };
 
-	capacity_t getTotalBytesRead() { return mTotalBytesRead; };
-	void setTotalBytesRead(capacity_t bytes) { mTotalBytesRead = bytes; };
-	capacity_t getTotalBytesWritten() { return mTotalBytesWritten; };
-	void setTotalBytesWritten(capacity_t bytes) { mTotalBytesWritten = bytes; };
+   void init();
+   
+   unsigned int getCurrentIteration() const { return mCurrentIteration; };
+   void setCurrentIteration(unsigned int iter) { mCurrentIteration = iter; };
+   void incCurrentIteration() { mCurrentIteration++; };
+   
+   TimeHack getTotalReadTransferTime() const { return mTotalReadTransferTime; };
+   void setTotalReadTransferTime(const TimeHack &hack) { mTotalReadTransferTime = hack; };
+   void addToTotalReadTransferTime(const TimeHack &hack) { mTotalReadTransferTime += hack; };
 
-	capacity_t getTotalReadOps() { return mTotalReadOps; };
-	void setTotalReadOps(capacity_t ops) { mTotalReadOps = ops; };
-	capacity_t getTotalWriteOps() { return mTotalWriteOps; };
-	void setTotalWriteOps(capacity_t ops) { mTotalWriteOps = ops; };
+   TimeHack getTotalWriteTransferTime() const { return mTotalWriteTransferTime; };
+   void setTotalWriteTransferTime(const TimeHack &hack) { mTotalWriteTransferTime = hack; };
+   void addToTotalWriteTransferTime(const TimeHack &hack) { mTotalWriteTransferTime += hack; };
+
+   capacity_t getTotalBytesRead() const { return mTotalBytesRead; };
+   void setTotalBytesRead(capacity_t bytes) { mTotalBytesRead = bytes; };
+   void addToTotalBytesRead(capacity_t bytes) { mTotalBytesRead += bytes; };
+
+
+   capacity_t getTotalBytesWritten() const { return mTotalBytesWritten; };
+   void setTotalBytesWritten(capacity_t bytes) { mTotalBytesWritten = bytes; };
+   void addToTotalBytesWritten(capacity_t bytes) { mTotalBytesWritten += bytes; };
+
+   capacity_t getTotalReadOps() const { return mTotalReadOps; };
+   void setTotalReadOps(capacity_t ops) { mTotalReadOps = ops; };
+   void addToTotalReadOps(capacity_t ops) { mTotalReadOps += ops; };
+
+   capacity_t getTotalWriteOps() const { return mTotalWriteOps; };
+   void setTotalWriteOps(capacity_t ops) { mTotalWriteOps = ops; };
+   void addToTotalWriteOps(capacity_t ops) { mTotalWriteOps += ops; };
 
    ~CumulativeStatistics();
 
 private:
    CumulativeStatistics(const CumulativeStatistics& stats);
-	CumulativeStatistics& operator=(const CumulativeStatistics &rhs);
+   CumulativeStatistics& operator=(const CumulativeStatistics &rhs);
 
 private:
-	unsigned int mCurrentIteration;
-	TimeHack mTotalReadTransferTime;
-	TimeHack mTotalWriteTransferTime;
-	capacity_t mTotalBytesRead;
-	capacity_t mTotalBytesWritten;
-	capacity_t mTotalReadOps;
-	capacity_t mTotalWriteOps;
+   unsigned int mCurrentIteration;
+   TimeHack mTotalReadTransferTime;
+   TimeHack mTotalWriteTransferTime;
+   capacity_t mTotalBytesRead;
+   capacity_t mTotalBytesWritten;
+   capacity_t mTotalReadOps;
+   capacity_t mTotalWriteOps;
 
 };
 

@@ -36,7 +36,7 @@ public:
 
 private:
    Statistics(const Statistics& stats);
-	Statistics& operator=(const Statistics &rhs);
+   Statistics& operator=(const Statistics &rhs);
 };
 
 #endif // STATISTICS_H

@@ -33,6 +33,19 @@ using namespace std;
 ///////////////  CumulativeStatistics::CumulativeStatistics()  ////////////////
 CumulativeStatistics::CumulativeStatistics()
 {
+   this->init();
+}
+
+///////////////  CumulativeStatistics::init()  ////////////////////////////////
+void CumulativeStatistics::init()
+{
+   mCurrentIteration = 0;
+   mTotalReadTransferTime = 0.0;
+   mTotalWriteTransferTime = 0.0;
+   mTotalBytesRead = 0;
+   mTotalBytesWritten = 0;
+   mTotalReadOps = 0;
+   mTotalWriteOps = 0;
 }
 
 
