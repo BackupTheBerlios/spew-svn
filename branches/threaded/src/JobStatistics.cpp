@@ -37,11 +37,30 @@ JobStatistics::JobStatistics()
 }
 
 
+//////////////////////////  JobStatistics::JobStatistics()  ///////////////////
+JobStatistics::JobStatistics(const JobStatistics &rhs)
+{
+   mJobStartTime = rhs.mJobStartTime;
+   mJobEndTime = rhs.mJobEndTime;
+   mJobBytesTransferred = rhs.mJobBytesTransferred;
+
+   mHackRowStartTime = rhs.mHackRowStartTime;
+   mHackRowEndTime = rhs.mHackRowEndTime;
+   mHackRowBytesTransferred = rhs.mHackRowBytesTransferred;
+
+   mTransferStartTime = rhs.mTransferStartTime;
+   mTransferEndTime = rhs.mTransferEndTime;
+   mTransferBytesTransferred = rhs.mTransferBytesTransferred;
+
+   mNumTransfersWithDataIntegrityErrors = rhs.mNumTransfersWithDataIntegrityErrors;
+}
+
+
 //////////////////////////  JobStatistics::init()  ////////////////////////////
 void JobStatistics::init()
 {
    mJobBytesTransferred = 0;
-   mHackBytesTransferred = 0;
+   mHackRowBytesTransferred = 0;
    mTransferBytesTransferred = 0;
    mNumTransfersWithDataIntegrityErrors = 0;
 }

@@ -41,6 +41,7 @@ public:
             u32_t seed,
             capacity_t jobId);
 
+   virtual IoDirection_t getIoDirection() const { return WRITING; };
    virtual int startJob();
    virtual int finishJob();
    virtual int runTransfers(capacity_t numTransfers, bool continueAfterError);

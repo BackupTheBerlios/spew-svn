@@ -38,9 +38,9 @@ public:
 
    void init();
    
-   unsigned int getCurrentIteration() const { return mCurrentIteration; };
-   void setCurrentIteration(unsigned int iter) { mCurrentIteration = iter; };
-   void incCurrentIteration() { mCurrentIteration++; };
+   unsigned int getIterations() const { return mIterations; };
+   void setIterations(unsigned int iter) { mIterations = iter; };
+   void incIterations() { mIterations++; };
    
    TimeHack getTotalReadTransferTime() const { return mTotalReadTransferTime; };
    void setTotalReadTransferTime(const TimeHack &hack) { mTotalReadTransferTime = hack; };
@@ -74,7 +74,7 @@ private:
    CumulativeStatistics& operator=(const CumulativeStatistics &rhs);
 
 private:
-   unsigned int mCurrentIteration;
+   unsigned int mIterations;
    TimeHack mTotalReadTransferTime;
    TimeHack mTotalWriteTransferTime;
    capacity_t mTotalBytesRead;

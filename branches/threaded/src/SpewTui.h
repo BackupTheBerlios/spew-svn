@@ -81,24 +81,13 @@ public:
    virtual void noEndHack();
    virtual void nextHackRow();
 
-   virtual void intermediateStatistics(capacity_t hackRowBytesTransferred,
-                                       const TimeHack& hackRowTransferTime,
-                                       capacity_t jobBytesTransferred,
-                                       const TimeHack& jobTransferTime,
+   virtual void intermediateStatistics(const JobStatistics &jobStats,
+                                       const CumulativeStatistics &cumStats,
                                        capacity_t bytesInJob,
-                                       capacity_t totalBytesRead,
-                                       const TimeHack& totalReadTransferTime,
-                                       capacity_t totalBytesWritten,
-                                       const TimeHack& totalWriteTransferTime,
+                                       const TimeHack& currentTime,
                                        const TimeHack& totalRunTime);
-   virtual void cumulativeStatistics(capacity_t jobBytesTransferred,
-                                     const TimeHack& jobTransferTime,
-                                     capacity_t totalBytesRead,
-                                     const TimeHack& totalReadTransferTime,
-                                     capacity_t totalReadOps,
-                                     capacity_t totalBytesWritten,
-                                     const TimeHack& totalWriteTransferTime,
-                                     capacity_t totalWriteOps,
+   virtual void cumulativeStatistics(const JobStatistics &jobStats,
+                                     const CumulativeStatistics &cumStats,
                                      const TimeHack& totalRunTime);
 
    virtual void startRun();

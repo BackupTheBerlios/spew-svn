@@ -136,13 +136,6 @@ Log *gLogger = (Log *)NULL;
 capacity_t gJobId = 0;
 SpewDisplay *gDisplay = (SpewDisplay *)NULL; 
 CumulativeStatistics gCumStats;
-//unsigned int gCurrentIteration = 0;
-//TimeHack gTotalReadTransferTime;
-//TimeHack gTotalWriteTransferTime;
-//capacity_t gTotalBytesRead = 0;
-//capacity_t gTotalBytesWritten = 0;
-//capacity_t gTotalWriteOps = 0;
-//capacity_t gTotalReadOps = 0;
 TimeHack gProgramStartTime;
 unsigned int gFoundTransferErrors = 0;
 
@@ -156,16 +149,18 @@ bool parse_options(int argc, const char **argv, string& cmdArgs);
 bool validate_options();
 void end_program(int exitCode);
 void end_program(int exitCode, char *fmt, ...);
-void update_transfer_totals(const Job *job,
-                            IoDirection_t ioDirection,
-                            CumulativeStatistics &cumStats);
 void intermediate_statistics(const Job *job, 
-                             IoDirection_t ioDirection,
                              const CumulativeStatistics &cumStats);
 void cumulative_statistics(const Job *job, 
-                           IoDirection_t ioDirection,
                            const CumulativeStatistics &cumStats);
-void run_statistics(const CumulativeStatistics &cumStats);
+void end_statistics(const CumulativeStatistics &cumStats);
+int run_transfers(Job &job, 
+                  capacity_t numTransfers, 
+                  bool continueAfterError,
+                  CumulativeStatistics &cumStats);
+void run_job(Job *job,
+             CumulativeStatistics &cumStats);
+void run_jobs(operation_enum operation, CumulativeStatistics &cumStats);
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -929,7 +924,7 @@ void end_program(int exitCode, char *fmt, ...)
    if (gLogger)
    {
       if (exitCode == EXIT_OK)
-         run_statistics(gCumStats);
+         end_statistics(gCumStats);
       if (gFoundTransferErrors > 0)
       {
          if (gLogfilePath.length() > 0)
@@ -974,28 +969,8 @@ void resize(int sig)
 }
 
 
-//////////////////////////  update_job_times()  //////////////////////////////
-void update_transfer_totals(const Job *job,
-                            IoDirection_t ioDirection,
-                            CumulativeStatistics &cumStats)
-{
-   switch (ioDirection)
-   {
-   case READING:
-      cumStats.addToTotalBytesRead(job->getBytesTransferred());
-      cumStats.addToTotalReadTransferTime(job->getTransferEndTime() - job->getTransferStartTime()); 
-      break;
-   case WRITING:
-      cumStats.addToTotalBytesWritten(job->getBytesTransferred());
-      cumStats.addToTotalWriteTransferTime(job->getTransferEndTime() - job->getTransferStartTime()); 
-      break;
-   }
-}
-
-
 //////////////////////////  intermediate_statistics() /////////////////////////
 void intermediate_statistics(const Job *job, 
-                             IoDirection_t ioDirection,
                              const CumulativeStatistics &cumStats)
 {
    capacity_t totalBytesRead = cumStats.getTotalBytesRead();
@@ -1003,7 +978,7 @@ void intermediate_statistics(const Job *job,
    capacity_t totalBytesWritten = cumStats.getTotalBytesWritten();
    TimeHack totalWriteTransferTime = cumStats.getTotalWriteTransferTime();
    TimeHack currentTime(TimeHack::getCurrentTime());
-   switch (ioDirection)
+   switch (job->getIoDirection())
    {
    case READING:
       totalBytesRead += job->getJobBytesTransferred();
@@ -1014,44 +989,32 @@ void intermediate_statistics(const Job *job,
       totalWriteTransferTime += currentTime - job->getJobStartTime();
       break;
    }
-   gDisplay->intermediateStatistics(job->getHackBytesTransferred(),
-                                    job->getHackEndTime() - job->getHackStartTime(),
-                                    job->getJobBytesTransferred(),
-                                    currentTime - job->getJobStartTime(),
+   gDisplay->intermediateStatistics(*job->getStatistics(),
+                                    cumStats, 
                                     job->getTransferSize(),
-                                    totalBytesRead,
-                                    totalReadTransferTime.getTime(),
-                                    totalBytesWritten,
-                                    totalWriteTransferTime.getTime(), 
+                                    TimeHack::getCurrentTime(),
                                     currentTime - gProgramStartTime);
 }
 
 
 //////////////////////////  cumulative_statistics()  //////////////////////////
 void cumulative_statistics(const Job *job, 
-                           IoDirection_t ioDirection,
                            const CumulativeStatistics &cumStats)
 {
    TimeHack now(TimeHack::getCurrentTime());
    TimeHack jobTransferTime(job->getJobEndTime() - job->getJobStartTime());
-   gDisplay->cumulativeStatistics(job->getJobBytesTransferred(), 
-                                  jobTransferTime.getTime(),
-                                  cumStats.getTotalBytesRead(),
-                                  cumStats.getTotalReadTransferTime().getTime(),
-                                  cumStats.getTotalReadOps(),
-                                  cumStats.getTotalBytesWritten(),
-                                  cumStats.getTotalWriteTransferTime().getTime(), 
-                                  cumStats.getTotalWriteOps(),
+   gDisplay->cumulativeStatistics(*job->getStatistics(),
+                                  cumStats,
                                   now - gProgramStartTime);
 
    long double transferRate = convertCapacity((long double)job->getJobBytesTransferred(), gUnits)/jobTransferTime.getTime();
    long double iops = (long double)job->getTotalNumberOfTransfers()/(long double)jobTransferTime.getTime();
 
-   switch (ioDirection)
+   switch (job->getIoDirection())
    {
    case READING:
       gLogger->logNote("Iter: %5d   RTR: %11.2Lf %-5s   TT: %s   IOPS: %11.2Lf\n",
-                       cumStats.getCurrentIteration(),
+                       cumStats.getIterations(),
                        transferRate, 
                        getTransferRateUnitsStr(gUnits), 
                        jobTransferTime.getElapsedTimeStr().c_str(),
@@ -1059,7 +1022,7 @@ void cumulative_statistics(const Job *job,
       break;
    case WRITING:
       gLogger->logNote("Iter: %5d   WTR: %11.2Lf %-5s   TT: %s   IOPS: %11.2Lf\n",
-                       cumStats.getCurrentIteration(),
+                       cumStats.getIterations(),
                        transferRate, 
                        getTransferRateUnitsStr(gUnits), 
                        jobTransferTime.getElapsedTimeStr().c_str(),
@@ -1069,8 +1032,8 @@ void cumulative_statistics(const Job *job,
 }
 
 
-//////////////////////////  run_statistics()  ////////////////////////////////
-void run_statistics(const CumulativeStatistics &cumStats)
+//////////////////////////  end_statistics()  ////////////////////////////////
+void end_statistics(const CumulativeStatistics &cumStats)
 {
    unsigned int device;
    device = Log::OUTPUT_LOG_STDOUT;
@@ -1082,7 +1045,7 @@ void run_statistics(const CumulativeStatistics &cumStats)
    if (!gUseTui)
       gLogger->note(device, "\n");
    gLogger->note(device, "Total iterations:                %17u\n",
-                 cumStats.getCurrentIteration());
+                 cumStats.getIterations());
    gLogger->note(device, "Total runtime:                   %17s\n",
                  gProgramStartTime.getTimeDiffStr(now).c_str());
 
@@ -1111,10 +1074,34 @@ void run_statistics(const CumulativeStatistics &cumStats)
 }
 
 
-//////////////////////////  do_job()  /////////////////////////////////////////
-void do_job(Job *job,
-            IoDirection_t ioDirection,
-            CumulativeStatistics &cumStats)
+//////////////////////////  run_transfers()  //////////////////////////////////
+int run_transfers(Job *job, 
+                  capacity_t numTransfers, 
+                  bool continueAfterError,
+                  CumulativeStatistics &cumStats)
+{
+   int ret;
+
+   ret = job->runTransfers(numTransfers, continueAfterError);
+
+   switch (job->getIoDirection())
+   {
+   case READING:
+      cumStats.addToTotalBytesRead(job->getBytesTransferred());
+      cumStats.addToTotalReadTransferTime(job->getTransferEndTime() - job->getTransferStartTime()); 
+      break;
+   case WRITING:
+      cumStats.addToTotalBytesWritten(job->getBytesTransferred());
+      cumStats.addToTotalWriteTransferTime(job->getTransferEndTime() - job->getTransferStartTime()); 
+      break;
+   }
+
+   return ret;
+}
+
+
+//////////////////////////  run_job()  ////////////////////////////////////////
+void run_job(Job *job, CumulativeStatistics &cumStats)
 {
    int ret;
    capacity_t startingVerticalHacks = gDisplay->getCurrentNumVerticalHacks();
@@ -1148,7 +1135,7 @@ void do_job(Job *job,
       capacity_t bufferSize = job->getBufferSize();
       capacity_t remainingTransfers;
 
-      gDisplay->startJob(cumStats.getCurrentIteration(), ioDirection);
+      gDisplay->startJob(cumStats.getIterations(), job->getIoDirection());
       ret = job->startJob();
       if (ret != EXIT_OK)
       {
@@ -1157,12 +1144,13 @@ void do_job(Job *job,
       for (capacity_t i = 1LLU; i <= verticalHacks - 1; i++)
       {
          // Run transfers for horizontal hacks.
-         job->startHack();
+         job->startHackRow();
          for (capacity_t j = 1LLU; j <= horizontalHacks - 1; j++)
          {
-            ret = job->runTransfers(transfersPerHorizontalHack,
-                                    gContinueAfterError);
-            update_transfer_totals(job, ioDirection, cumStats);
+            ret = run_transfers(job, 
+                                transfersPerHorizontalHack, 
+                                gContinueAfterError,
+                                cumStats);
             if (ret != EXIT_OK)
             {
                gFoundTransferErrors++;
@@ -1185,8 +1173,10 @@ void do_job(Job *job,
             
          // Finish remaining transfers for last horizontal hack.
          remainingTransfers = transfersPerVerticalHack - (transfersPerHorizontalHack * (horizontalHacks - 1));
-         ret = job->runTransfers(remainingTransfers, gContinueAfterError);
-         update_transfer_totals(job, ioDirection, cumStats);
+         ret = run_transfers(job, 
+                             remainingTransfers, 
+                             gContinueAfterError,
+                             cumStats);
          if (ret != EXIT_OK)
          {
             gFoundTransferErrors++;
@@ -1205,14 +1195,14 @@ void do_job(Job *job,
          {
             gDisplay->endHack();
          }
-         job->endHack();
+         job->endHackRow();
          for (capacity_t j = 0;
               j < startingHorizontalHacks - horizontalHacks;
               j++)
          {
             gDisplay->noHack();
          }
-         intermediate_statistics(job, ioDirection, cumStats);
+         intermediate_statistics(job, cumStats);
          gDisplay->nextHackRow();
       }
 
@@ -1220,7 +1210,7 @@ void do_job(Job *job,
       remainingTransfers = (transferSize - job->getJobBytesTransferred())/bufferSize;
       if (remainingTransfers > 0LLU)
       {
-         job->startHack();
+         job->startHackRow();
          transfersPerHorizontalHack = (capacity_t)((double)remainingTransfers/(double)startingHorizontalHacks);
          if (transfersPerHorizontalHack <= 1)
          {
@@ -1232,9 +1222,10 @@ void do_job(Job *job,
          }
          for (capacity_t j = 1LLU; j <= horizontalHacks - 1; j++)
          {
-            ret = job->runTransfers(transfersPerHorizontalHack,
-                                    gContinueAfterError);
-            update_transfer_totals(job, ioDirection, cumStats);
+            ret = run_transfers(job, 
+                                transfersPerHorizontalHack,
+                                gContinueAfterError,
+                                cumStats);
             if (ret != EXIT_OK)
             {
                gFoundTransferErrors++;
@@ -1255,8 +1246,11 @@ void do_job(Job *job,
                gDisplay->hack();
             }
          }
-         ret = job->runTransfers(remainingTransfers - (transfersPerHorizontalHack * (horizontalHacks - 1)), gContinueAfterError);
-         update_transfer_totals(job, ioDirection, cumStats);
+         ret = run_transfers(job, 
+                             remainingTransfers - (transfersPerHorizontalHack * (horizontalHacks - 1)), 
+                             gContinueAfterError,
+                             cumStats);
+                             
          if (ret != EXIT_OK)
          {
             gFoundTransferErrors++;
@@ -1275,14 +1269,14 @@ void do_job(Job *job,
          {
             gDisplay->endHack();
          }
-         job->endHack();
+         job->endHackRow();
          for (capacity_t j = 0; 
               j < startingHorizontalHacks - horizontalHacks;
               j++)
          {
             gDisplay->noHack();
          }
-         intermediate_statistics(job, ioDirection, cumStats);
+         intermediate_statistics(job, cumStats);
          gDisplay->nextHackRow();
       }
       ret = job->finishJob();
@@ -1294,15 +1288,17 @@ void do_job(Job *job,
    }
    else
    {
-      gDisplay->startJob(cumStats.getCurrentIteration(), ioDirection);
+      gDisplay->startJob(cumStats.getIterations(), job->getIoDirection());
       ret = job->startJob();
       if (ret != EXIT_OK)
       {
          end_program(ret, "%s\n", job->getLastErrorMessage().c_str());
          exit(ret);
       }
-      ret = job->runTransfers(totalTransfers, gContinueAfterError);
-      update_transfer_totals(job, ioDirection, cumStats);
+      ret = run_transfers(job, 
+                          totalTransfers,
+                          gContinueAfterError,
+                          cumStats);
       if (ret != EXIT_OK)
       {
          gFoundTransferErrors++;
@@ -1323,7 +1319,7 @@ void do_job(Job *job,
    }
    // May get incremental time errors during transfers, so reset transfer 
    // totals to old value plus total job time.
-   switch (ioDirection)
+   switch (job->getIoDirection())
    {
    case READING:
       cumStats.setTotalReadTransferTime(savedTotalReadTransferTime + job->getJobEndTime() - job->getJobStartTime());
@@ -1334,7 +1330,7 @@ void do_job(Job *job,
    }
 
    // Update IOPS.
-   switch (ioDirection)
+   switch (job->getIoDirection())
    {
    case READING:
       cumStats.addToTotalReadOps(job->getTotalNumberOfTransfers()); 
@@ -1344,20 +1340,20 @@ void do_job(Job *job,
       break;
    }
 
-   cumulative_statistics(job, ioDirection, cumStats);
+   cumulative_statistics(job, cumStats);
    gDisplay->endJob();
 }
 
 
-//////////////////////////  run()  ////////////////////////////////////////////
-void run(operation_enum operation, CumulativeStatistics &cumStats)
+//////////////////////////  run_jobs()  ///////////////////////////////////////
+void run_jobs(operation_enum operation, CumulativeStatistics &cumStats)
 {
    int ret;
 
-   cumStats.setCurrentIteration(0);
+   cumStats.setIterations(0);
    do
    {
-      cumStats.incCurrentIteration();
+      cumStats.incIterations();
       if (operation == OPERATION_WRITE || 
           operation == OPERATION_READ_AFTER_WRITE)
       {
@@ -1384,12 +1380,12 @@ void run(operation_enum operation, CumulativeStatistics &cumStats)
             exit(ret);
          }
          
-         do_job(job, WRITING, cumStats);
+         run_job(job, cumStats);
          delete job;
          
          if (gIterationsToDo == 0 || 
-             cumStats.getCurrentIteration() < gIterationsToDo ||
-             cumStats.getCurrentIteration() == gIterationsToDo && 
+             cumStats.getIterations() < gIterationsToDo ||
+             cumStats.getIterations() == gIterationsToDo && 
              operation == OPERATION_READ_AFTER_WRITE)
          {
             gDisplay->nextJob();
@@ -1422,16 +1418,16 @@ void run(operation_enum operation, CumulativeStatistics &cumStats)
             exit(ret);
          }
 
-         do_job(job, READING, cumStats);
+         run_job(job, cumStats);
          delete job;
 
-         if (gIterationsToDo == 0 || cumStats.getCurrentIteration() < gIterationsToDo)
+         if (gIterationsToDo == 0 || cumStats.getIterations() < gIterationsToDo)
          {
             gDisplay->nextJob();
          }
       }
 
-   } while (gIterationsToDo == 0LLU || cumStats.getCurrentIteration() < gIterationsToDo);
+   } while (gIterationsToDo == 0LLU || cumStats.getIterations() < gIterationsToDo);
 }
 
 
@@ -1503,7 +1499,7 @@ int main(int argc, char *argv[])
 
    try 
    {
-      run(gOperation, gCumStats);
+      run_jobs(gOperation, gCumStats);
    } catch(...)
    {
       gLogger->showError("Caught exception\n");

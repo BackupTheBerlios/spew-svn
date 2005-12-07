@@ -151,8 +151,8 @@ int ReadJob::runTransfers(capacity_t numTransfers, bool continueAfterError)
       case EXIT_OK:
          mStats->addToJobBytesTransferred(transferSize);
          mStats->addToTransferBytesTransferred(transferSize);
-         if (mRunningHack)
-            mStats->addToHackBytesTransferred(transferSize);
+         if (mRunningHackRow)
+            mStats->addToHackRowBytesTransferred(transferSize);
          break;
       case EXIT_ERROR_DATA_INTEGRITY:
          exitCode = EXIT_ERROR_DATA_INTEGRITY;

@@ -72,7 +72,7 @@ Job::Job(Log &logger,
    mRealBuffer = (unsigned char *)NULL;
    mBuffer = (unsigned char *)NULL;
    mLastErrorMsg = "";
-   mRunningHack = false;
+   mRunningHackRow = false;
 }
 
 
@@ -91,8 +91,8 @@ int Job::init()
    }
    mBuffer = PTR_ALIGN(mRealBuffer, pageSize);
 
-	// Initialize statistics.
-	mStats = new JobStatistics();
+   // Initialize statistics.
+   mStats = new JobStatistics();
    if (!mStats)
    {
       mLastErrorMsg = "Cannot allocate memory.\n";
@@ -195,65 +195,65 @@ TimeHack::timehack_t Job::getTotalJobTime() const
 }
 
 
-/////////////////////////  Job::setHackStartTime()  ///////////////////////////
-void Job::setHackStartTime()
+/////////////////////////  Job::setHackRowStartTime()  ////////////////////////
+void Job::setHackRowStartTime()
 {
-   mStats->setHackStartTime();
+   mStats->setHackRowStartTime();
 }
 
 
-////////////////////////  Job::getHackStartTime()  ////////////////////////////
-TimeHack::timehack_t Job::getHackStartTime() const
+////////////////////////  Job::getHackRowStartTime()  /////////////////////////
+TimeHack::timehack_t Job::getHackRowStartTime() const
 {
-   return mStats->getHackStartTime().getTime();
+   return mStats->getHackRowStartTime().getTime();
 }
 
 
-/////////////////////////  Job::setHackEndTime()  /////////////////////////////
-void Job::setHackEndTime()
+/////////////////////////  Job::setHackRowEndTime()  //////////////////////////
+void Job::setHackRowEndTime()
 {
-   mStats->setHackEndTime();
+   mStats->setHackRowEndTime();
 }
 
 
-/////////////////////////  Job::getHackEndTime()  /////////////////////////////
-TimeHack::timehack_t Job::getHackEndTime() const
+/////////////////////////  Job::getHackRowEndTime()  //////////////////////////
+TimeHack::timehack_t Job::getHackRowEndTime() const
 {
-   return mStats->getHackEndTime().getTime();
+   return mStats->getHackRowEndTime().getTime();
 }
 
 
-/////////////////////////  Job::getHackElapsedTime()  /////////////////////////
-TimeHack::timehack_t Job::getHackElapsedTime() const
+/////////////////////////  Job::getHackRowElapsedTime()  //////////////////////
+TimeHack::timehack_t Job::getHackRowElapsedTime() const
 {
 
-   return TimeHack::getCurrentTime() - this->getHackStartTime();
+   return TimeHack::getCurrentTime() - this->getHackRowStartTime();
 }
 
 
-/////////////////////////  Job::getTotalHackTime()  ///////////////////////////
-TimeHack::timehack_t Job::getTotalHackTime() const
+/////////////////////////  Job::getTotalHackRowTime()  ////////////////////////
+TimeHack::timehack_t Job::getTotalHackRowTime() const
 {
-   return mStats->getHackEndTime().getTime() - mStats->getHackStartTime().getTime();
+   return mStats->getHackRowEndTime().getTime() - mStats->getHackRowStartTime().getTime();
 }
 
 
-/////////////////////////  Job::startHack()  //////////////////////////////////
-int Job::startHack()
+/////////////////////////  Job::startHackRow()  ///////////////////////////////
+int Job::startHackRow()
 {
-   mRunningHack = true;
-   mStats->setHackBytesTransferred(0);
-   this->setHackStartTime();
+   mRunningHackRow = true;
+   mStats->setHackRowBytesTransferred(0);
+   this->setHackRowStartTime();
 
    return EXIT_OK;
 }
 
 
-/////////////////////////  Job::endHack()  ////////////////////////////////////
-int Job::endHack()
+/////////////////////////  Job::endHackRow()  /////////////////////////////////
+int Job::endHackRow()
 {
-   this->setHackEndTime();
-   mRunningHack = false;
+   this->setHackRowEndTime();
+   mRunningHackRow = false;
 
    return EXIT_OK;
 }
@@ -297,6 +297,6 @@ Job::~Job()
       mBuffer = (unsigned char*)NULL;
    }
    delete mTransfer;
-	delete mStats;
+   delete mStats;
    delete mTransferInfoList;
 }

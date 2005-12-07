@@ -29,6 +29,7 @@ using namespace std;
 #include <stdio.h>
 #include "common.h"
 #include "SpewConsole.h"
+#include "TimeHack.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -184,20 +185,16 @@ void SpewConsole::nextHackRow()
 
 
 ///////////////  SpewConsole::intermediateStatistics()  ///////////////////////
-void SpewConsole::intermediateStatistics(
-   capacity_t hackRowBytesTransferred,
-   const TimeHack& hackRowTransferTime,
-   capacity_t jobBytesTransferred,
-   const TimeHack& jobTransferTime,
-   capacity_t bytesInJob,
-   capacity_t totalBytesRead,
-   const TimeHack& totalReadTransferTime,
-   capacity_t totalBytesWritten,
-   const TimeHack& totalWriteTransferTime,
-   const TimeHack& totalRunTime)
+void SpewConsole::intermediateStatistics(const JobStatistics &jobStats,
+                                         const CumulativeStatistics &cumStats,
+                                         capacity_t bytesInJob,
+                                         const TimeHack& currentTime,
+                                         const TimeHack& totalRunTime)
 {
-   long double transferRate = convertCapacity(hackRowBytesTransferred, mCurrentUnits)/(long double)hackRowTransferTime.getTime();
-   long double percentage = (long double)jobBytesTransferred/(long double)bytesInJob*100.0;
+
+   long double hackRowTransferTime = jobStats.getHackRowEndTime() - jobStats.getHackRowStartTime();
+   long double transferRate = convertCapacity(jobStats.getHackRowBytesTransferred(), mCurrentUnits)/hackRowTransferTime;
+   long double percentage = (long double)jobStats.getJobBytesTransferred()/(long double)bytesInJob*100.0;
 
    printf(" %3.Lf%%", percentage);
    printf(" %11.2Lf %-5s", 
@@ -207,20 +204,16 @@ void SpewConsole::intermediateStatistics(
 
 
 /////////////////  SpewConsole::cumulativeStatistics()  ///////////////////////
-void SpewConsole::cumulativeStatistics(capacity_t jobBytesTransferred,
-                                       const TimeHack& jobTransferTime,
-                                       capacity_t totalBytesRead,
-                                       const TimeHack& totalReadTransferTime,
-                                       capacity_t totalReadOps,
-                                       capacity_t totalBytesWritten,
-                                       const TimeHack& totalWriteTransferTime,
-                                       capacity_t totalWriteOps,
+void SpewConsole::cumulativeStatistics(const JobStatistics &jobStats,
+                                       const CumulativeStatistics &cumStats,
                                        const TimeHack& totalRunTime)
 {
    if (mVerbosity == VERBOSITY_NONE)
       return;
 
-   long double transferRate = convertCapacity((long double)jobBytesTransferred, mCurrentUnits)/(long double)jobTransferTime.getTime();
+   TimeHack jobTransferTime = jobStats.getJobEndTime() - jobStats.getJobStartTime();
+
+   long double transferRate = convertCapacity((long double)jobStats.getJobBytesTransferred(), mCurrentUnits)/jobTransferTime.getTime();
 
    if (mIterationsToDo != 1)
    {
@@ -234,14 +227,14 @@ void SpewConsole::cumulativeStatistics(capacity_t jobBytesTransferred,
              transferRate, 
              getTransferRateUnitsStr(mCurrentUnits), 
              jobTransferTime.getElapsedTimeStr().c_str(),
-             (long double)totalReadOps/(long double)jobTransferTime.getTime());  
+             (long double)cumStats.getTotalReadOps()/(long double)jobTransferTime.getTime());  
       break;
    case WRITING:
       printf("WTR: %11.2Lf %-5s   Transfer time: %s    IOPS: %11.2Lf\n",
              transferRate, 
              getTransferRateUnitsStr(mCurrentUnits), 
              jobTransferTime.getElapsedTimeStr().c_str(),
-             (long double)totalWriteOps/(long double)jobTransferTime.getTime());  
+             (long double)cumStats.getTotalWriteOps()/(long double)jobTransferTime.getTime());  
       break;
    }
    fflush(stdout);

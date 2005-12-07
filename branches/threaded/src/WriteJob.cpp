@@ -153,8 +153,8 @@ int WriteJob::runTransfers(capacity_t numTransfers, bool continueAfterError)
       {
          mStats->addToJobBytesTransferred(transferSize);
          mStats->addToTransferBytesTransferred(transferSize);
-         if (mRunningHack)
-            mStats->addToHackBytesTransferred(transferSize);
+         if (mRunningHackRow)
+            mStats->addToHackRowBytesTransferred(transferSize);
       }
       else
       {

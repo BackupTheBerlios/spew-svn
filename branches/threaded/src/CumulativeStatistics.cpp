@@ -39,7 +39,7 @@ CumulativeStatistics::CumulativeStatistics()
 ///////////////  CumulativeStatistics::init()  ////////////////////////////////
 void CumulativeStatistics::init()
 {
-   mCurrentIteration = 0;
+   mIterations = 0;
    mTotalReadTransferTime = 0.0;
    mTotalWriteTransferTime = 0.0;
    mTotalBytesRead = 0;

@@ -75,6 +75,7 @@ public:
    u32_t getSeed() const { return mSeed; };
    
    capacity_t getJobId() const { return mJobId; };
+   virtual IoDirection_t getIoDirection() const = 0;
    capacity_t getTotalNumberOfTransfers() const;
 
    void setJobStartTime();
@@ -87,15 +88,15 @@ public:
    virtual int startJob() = 0;
    virtual int finishJob() = 0;
 
-   void setHackStartTime();
-   TimeHack::timehack_t getHackStartTime() const;
-   void setHackEndTime();
-   TimeHack::timehack_t getHackEndTime() const;
-   TimeHack::timehack_t getHackElapsedTime() const;
-   TimeHack::timehack_t getTotalHackTime() const;
-   capacity_t getHackBytesTransferred() const { return mStats->getHackBytesTransferred(); };
-   virtual int startHack();
-   virtual int endHack();
+   void setHackRowStartTime();
+   TimeHack::timehack_t getHackRowStartTime() const;
+   void setHackRowEndTime();
+   TimeHack::timehack_t getHackRowEndTime() const;
+   TimeHack::timehack_t getHackRowElapsedTime() const;
+   TimeHack::timehack_t getTotalHackRowTime() const;
+   capacity_t getHackRowBytesTransferred() const { return mStats->getHackRowBytesTransferred(); };
+   virtual int startHackRow();
+   virtual int endHackRow();
 
    void setTransferStartTime();
    TimeHack::timehack_t getTransferStartTime() const;
@@ -106,6 +107,7 @@ public:
    string getLastErrorMessage() const { return mLastErrorMsg; };
    virtual int runTransfers(capacity_t numTransfers, 
                             bool continueAfterError) = 0;
+   const JobStatistics *getStatistics() const { return mStats; };
 
    virtual ~Job();
 
@@ -134,7 +136,7 @@ protected:
    unsigned char *mBuffer;        // Page-aligned pointer to mRealBuffer.
 
 
-   bool mRunningHack;
+   bool mRunningHackRow;
    string mLastErrorMsg;          // Holds last reported error message.
    capacity_t mJobId;  
 

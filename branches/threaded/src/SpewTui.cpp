@@ -34,6 +34,7 @@ using namespace std;
 #include <signal.h>
 
 #include "common.h"
+#include "TimeHack.h"
 #include "Tui.h"
 #include "SpewTui.h"
 #include "SpewTuiWindow.h"
@@ -341,34 +342,31 @@ void SpewTui::nextHackRow()
 
 
 ////////////////////  SpewTui::intermediateStatistics()  //////////////////////
-void SpewTui::intermediateStatistics(capacity_t hackRowBytesTransferred,
-                                     const TimeHack& hackRowTransferTime,
-                                     capacity_t jobBytesTransferred,
-                                     const TimeHack& jobTransferTime,
+void SpewTui::intermediateStatistics(const JobStatistics &jobStats,
+                                     const CumulativeStatistics &cumStats,
                                      capacity_t bytesInJob,
-                                     capacity_t totalBytesRead,
-                                     const TimeHack& totalReadTransferTime,
-                                     capacity_t totalBytesWritten,
-                                     const TimeHack& totalWriteTransferTime,
+                                     const TimeHack& currentTime,
                                      const TimeHack& totalRunTime)
 {
-   long double percentage = (long double)jobBytesTransferred/(long double)bytesInJob*100.0;
+   long double percentage = (long double)jobStats.getJobBytesTransferred()/(long double)bytesInJob*100.0;
+   TimeHack hackRowTransferTime = jobStats.getHackRowEndTime() - jobStats.getHackRowStartTime();
+   TimeHack jobTransferTime(currentTime);
+   jobTransferTime -= jobStats.getJobStartTime();
 
    if (mShowProgress)
    {
       mProgressWindow->currentTransferPercentage(percentage);
-      mProgressWindow->currentTransferRate(hackRowBytesTransferred, 
-                                           hackRowTransferTime);
+      mProgressWindow->currentTransferRate(jobStats.getHackRowBytesTransferred(), hackRowTransferTime.getTime());
       mProgressWindow->refresh();
    }
 
-   mStatsWindow->setJobBytesTransferred(jobBytesTransferred);
+   mStatsWindow->setJobBytesTransferred(jobStats.getJobBytesTransferred());
    mStatsWindow->setJobTransferTime(jobTransferTime);
    mStatsWindow->setBytesInJob(bytesInJob);
-   mStatsWindow->setTotalBytesRead(totalBytesRead);
-   mStatsWindow->setTotalReadTransferTime(totalReadTransferTime);
-   mStatsWindow->setTotalBytesWritten(totalBytesWritten);
-   mStatsWindow->setTotalWriteTransferTime(totalWriteTransferTime);
+   mStatsWindow->setTotalBytesRead(cumStats.getTotalBytesRead());
+   mStatsWindow->setTotalReadTransferTime(cumStats.getTotalReadTransferTime());
+   mStatsWindow->setTotalBytesWritten(cumStats.getTotalBytesWritten());
+   mStatsWindow->setTotalWriteTransferTime(cumStats.getTotalWriteTransferTime());
    mStatsWindow->setTotalRunTime(totalRunTime);
    mStatsWindow->refresh();
 
@@ -376,22 +374,19 @@ void SpewTui::intermediateStatistics(capacity_t hackRowBytesTransferred,
 }
 
 /////////////////////  SpewTui::cumulativeStatistics() ////////////////////////
-void SpewTui::cumulativeStatistics(capacity_t jobBytesTransferred,
-                                   const TimeHack& jobTransferTime,
-                                   capacity_t totalBytesRead,
-                                   const TimeHack& totalReadTransferTime,
-                                   capacity_t totalReadOps,
-                                   capacity_t totalBytesWritten,
-                                   const TimeHack& totalWriteTransferTime,
-                                   capacity_t totalWriteOps,
+void SpewTui::cumulativeStatistics(const JobStatistics &jobStats,
+                                   const CumulativeStatistics &cumStats,
                                    const TimeHack& totalRunTime)
 {
-   mStatsWindow->setJobBytesTransferred(jobBytesTransferred);
+
+   TimeHack jobTransferTime = jobStats.getJobEndTime() - jobStats.getJobStartTime();
+
+   mStatsWindow->setJobBytesTransferred(jobStats.getJobBytesTransferred());
    mStatsWindow->setJobTransferTime(jobTransferTime);
-   mStatsWindow->setTotalBytesRead(totalBytesRead);
-   mStatsWindow->setTotalReadTransferTime(totalReadTransferTime);
-   mStatsWindow->setTotalBytesWritten(totalBytesWritten);
-   mStatsWindow->setTotalWriteTransferTime(totalWriteTransferTime);
+   mStatsWindow->setTotalBytesRead(cumStats.getTotalBytesRead());
+   mStatsWindow->setTotalReadTransferTime(cumStats.getTotalReadTransferTime());
+   mStatsWindow->setTotalBytesWritten(cumStats.getTotalBytesWritten());
+   mStatsWindow->setTotalWriteTransferTime(cumStats.getTotalWriteTransferTime());
    mStatsWindow->setTotalRunTime(totalRunTime);
    mStatsWindow->refresh();
 

@@ -35,6 +35,7 @@ class JobStatistics: public Statistics
 {
 public:
    JobStatistics();
+   JobStatistics(const JobStatistics &rhs);
 
    void init();
    
@@ -42,17 +43,18 @@ public:
    void setJobStartTime() { mJobStartTime.setTimeNow(); };
    TimeHack getJobEndTime() const { return mJobEndTime; };
    void setJobEndTime() { mJobEndTime.setTimeNow(); };
+
    capacity_t getJobBytesTransferred() const { return mJobBytesTransferred; };
    void setJobBytesTransferred(capacity_t bytes) { mJobBytesTransferred = bytes; };
    void addToJobBytesTransferred(capacity_t bytes) { mJobBytesTransferred += bytes; };
 
-   TimeHack getHackStartTime() const { return mHackStartTime; };
-   void setHackStartTime() { mHackStartTime.setTimeNow(); };
-   TimeHack getHackEndTime() const { return mHackEndTime; };
-   void setHackEndTime() { mHackEndTime.setTimeNow(); };
-   capacity_t getHackBytesTransferred() const { return mHackBytesTransferred; };
-   void setHackBytesTransferred(capacity_t bytes) { mHackBytesTransferred = bytes; };
-   void addToHackBytesTransferred(capacity_t bytes) { mHackBytesTransferred += bytes; };
+   TimeHack getHackRowStartTime() const { return mHackRowStartTime; };
+   void setHackRowStartTime() { mHackRowStartTime.setTimeNow(); };
+   TimeHack getHackRowEndTime() const { return mHackRowEndTime; };
+   void setHackRowEndTime() { mHackRowEndTime.setTimeNow(); };
+   capacity_t getHackRowBytesTransferred() const { return mHackRowBytesTransferred; };
+   void setHackRowBytesTransferred(capacity_t bytes) { mHackRowBytesTransferred = bytes; };
+   void addToHackRowBytesTransferred(capacity_t bytes) { mHackRowBytesTransferred += bytes; };
 
    TimeHack getTransferStartTime() const { return mTransferStartTime; };
    void setTransferStartTime() { mTransferStartTime.setTimeNow(); };
@@ -70,7 +72,6 @@ public:
    virtual ~JobStatistics();
 
 private:
-   JobStatistics(const JobStatistics& stats);
    JobStatistics& operator=(const JobStatistics &rhs);
 
 private:
@@ -78,9 +79,9 @@ private:
    TimeHack mJobEndTime;
    capacity_t mJobBytesTransferred;
 
-   TimeHack mHackStartTime;
-   TimeHack mHackEndTime;
-   capacity_t mHackBytesTransferred;
+   TimeHack mHackRowStartTime;
+   TimeHack mHackRowEndTime;
+   capacity_t mHackRowBytesTransferred;
 
    TimeHack mTransferStartTime;
    TimeHack mTransferEndTime;
