@@ -119,6 +119,7 @@ AC_ARG_ENABLE(threads,
 	[
 	if test "x$pthreads_available" = "xyes"; then
 		AC_DEFINE(USE_THREADS, [1], Use threads)
+		LIBS="$LIBS -lpthread"
 	fi
 	]
 	)
