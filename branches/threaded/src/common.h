@@ -103,6 +103,7 @@ static const unsigned int DEFAULT_SCREEN_COLUMNS = 79;
 static const unsigned int DEFAULT_SCREEN_ROWS = 24;
 static const unsigned int DEFAULT_SCREEN_COLUMNS = 80;
 #endif
+static const unsigned int TMP_MAX_STR_SIZE = 256;
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -116,5 +117,7 @@ bool is_mounted(const char *path);
 long double convertCapacity(long double bytes, Units_t units);
 const char *getTransferRateUnitsStr(Units_t units);
 void localTime(const time_t *timep, struct tm *result);
+int strPrintf(string &str, const char *format, ...);
+int strnPrintf(string &str, const char *format, ...);
 
 #endif // COMMON_H
