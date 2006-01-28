@@ -114,27 +114,33 @@ int Log::startThread()
    mShutdown = false;
    pthread_mutex_init(&mMsgQueueMutex, NULL);
    pthread_cond_init(&mMsgQueueNotEmpty, NULL);
-
    mThread = (pthread_t *)malloc(sizeof(pthread_t));
-   int code = pthread_create(mThread, NULL, Log::doWork, this);
-
-   return code;
+   if (!mThread)
+      return ENOMEM;
+   if (pthread_create(mThread, NULL, Log::doWork, this) != 0)
+      return errno;
+   return EXIT_OK;
 }
 
 
 //////////////////////////  Log::stopThread()  ////////////////////////////////
 int Log::stopThread()
 {
+   int ret;
+
    pthread_mutex_lock(&mMsgQueueMutex);
    mShutdown = true;
    pthread_mutex_unlock(&mMsgQueueMutex);
-   pthread_join(*mThread, (void **)NULL);
+   if ((ret = pthread_join(*mThread, (void **)NULL)) != 0)
+       return ret;
+   pthread_mutex_destroy(&mMsgQueueMutex);
+   pthread_cond_destroy(&mMsgQueueNotEmpty);
    if (mThread)
    {
       free(mThread);
       mThread = (pthread_t *)NULL;
    }
-   return 0;
+   return EXIT_OK;
 }
 #endif  // USE_THREADS
 
@@ -173,6 +179,7 @@ Log::Log(const string &logfilePath): mLogfilePath(logfilePath)
 //////////////////////////  Log::open()  //////////////////////////////////////
 int Log::open()
 {
+   int rtn;
    FILE *logStdoutFile;
    if (mLogfilePath.size() > 0)
    {
@@ -183,7 +190,10 @@ int Log::open()
       mLogStderrFile = logStdoutFile;
    }
 
-   this->startThread();
+#ifdef USE_THREADS
+   if ((rtn = this->startThread()) != 0)
+      return rtn;
+#endif
    return EXIT_OK;
 }
 
@@ -191,13 +201,20 @@ int Log::open()
 //////////////////////////  Log::close()  /////////////////////////////////////
 int Log::close()
 {
-   this->stopThread();
+   int rtn = EXIT_OK;
+#ifdef USE_THREADS
+   rtn = this->stopThread();
+#endif
    if (mLogStdoutFile)
    {
       fclose(mLogStdoutFile);
    }
+   if (mLogStderrFile && mLogStderrFile != mLogStdoutFile)
+   {
+      fclose(mLogStderrFile);
+   }
 
-   return EXIT_OK;
+   return rtn;
 }
 
 

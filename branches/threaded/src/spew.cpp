@@ -904,6 +904,7 @@ void end_program(int exitCode)
 //////////////////////////  end_program()  ////////////////////////////////////
 void end_program(int exitCode, char *fmt, ...)
 {
+   int rtn;
    char msg[MAX_TMP_STR_LEN];
 
    if (gDisplay)
@@ -937,7 +938,13 @@ void end_program(int exitCode, char *fmt, ...)
          }
       }
       gLogger->logFinish();
-      gLogger->close();
+      if ((rtn = gLogger->close()) != 0)
+      {
+         error_msg("Could not close logfile \"%s\" -- %s\n",
+                   gLogfilePath.c_str(), strError(rtn).c_str());
+         if (exitCode == EXIT_OK)
+            exitCode = EXIT_ERROR_SYSTEM;
+      }
    }
 
    exit(exitCode);
