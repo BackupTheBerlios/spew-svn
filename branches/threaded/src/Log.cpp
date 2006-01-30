@@ -29,6 +29,7 @@ using namespace std;
 #include <stdio.h>
 #include <stdarg.h>
 #include <errno.h>
+#include <signal.h>
 #include <pthread.h>
 
 #include "common.h"
@@ -45,6 +46,10 @@ int LOGFILE_WIDTH = 80;
 //////////////////////////  Log::threadEntryPoint()  //////////////////////////
 void *Log::doWork(void *pthis)
 {
+	sigset_t sigsToBlock;
+	sigfillset(&sigsToBlock);
+	pthread_sigmask(SIG_BLOCK, &sigsToBlock, NULL);
+
    const Log *log = (Log *)pthis;
    unsigned int queueLen;
    for (;;)

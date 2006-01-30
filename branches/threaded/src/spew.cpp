@@ -976,6 +976,38 @@ void resize(int sig)
 }
 
 
+#ifdef USE_THREADS
+//////////////////////////  threads_signal_handler()  /////////////////////////
+void *threads_signal_handler(void *arg)
+{
+   sigset_t sigsToCatch;
+   int caught;
+
+   sigemptyset(&sigsToCatch);
+   sigaddset(&sigsToCatch, SIGQUIT);
+   sigaddset(&sigsToCatch, SIGTERM);
+   sigaddset(&sigsToCatch, SIGINT);
+
+   for (;;)
+   {
+      sigwait(&sigsToCatch, &caught);
+      switch(caught)
+      {
+      case SIGQUIT:
+      case SIGINT:
+         end_program(EXIT_OK);
+         break;
+      default:
+         end_program(EXIT_ERROR_CAUGHT_EXCEPTION, 
+                     "Caught signal \"%s\", exiting.\n", 
+                     strSignal(caught).c_str());
+         break;
+      }
+   }
+}
+#endif // USE_THREADS
+
+
 //////////////////////////  intermediate_statistics() /////////////////////////
 void intermediate_statistics(const Job *job, 
                              const CumulativeStatistics &cumStats)
@@ -1471,6 +1503,43 @@ int main(int argc, char *argv[])
       exit(0);
    }
 
+   struct sigaction action;
+#ifdef USE_THREADS
+   sigset_t sigsToBlock;
+   sigemptyset(&sigsToBlock);
+   sigaddset(&sigsToBlock, SIGQUIT);
+   sigaddset(&sigsToBlock, SIGTERM);
+   sigaddset(&sigsToBlock, SIGINT);
+   pthread_sigmask(SIG_BLOCK, &sigsToBlock, NULL);
+
+   action.sa_handler = resize;
+   sigemptyset(&action.sa_mask);
+   action.sa_flags = SA_RESTART;
+   sigaction(SIGWINCH, &action, NULL);
+
+   pthread_t signal_handler_thread;
+   if (pthread_create(&signal_handler_thread, 
+                      NULL,
+                      &threads_signal_handler,
+                      NULL))
+   {
+      error_msg("Could not create thread.\n");
+      exit(EXIT_ERROR_SYSTEM);
+   }
+#else
+   action.sa_handler = cleanup;
+   sigemptyset(&action.sa_mask);
+   action.sa_flags = 0;
+   sigaction(SIGQUIT, &action, NULL);
+   sigaction(SIGTERM, &action, NULL);
+   sigaction(SIGINT, &action, NULL);
+
+   action.sa_handler = resize;
+   sigemptyset(&action.sa_mask);
+   action.sa_flags = SA_RESTART;
+   sigaction(SIGWINCH, &action, NULL);
+#endif // USE_THREADS
+
    gLogger = new Log(gLogfilePath);
    if (gLogger == (Log *)NULL)
    {
@@ -1481,11 +1550,6 @@ int main(int argc, char *argv[])
       end_program(rtn, "Could not open logfile \"%s\" -- %s\n",
                   gLogfilePath.c_str(), strError(rtn).c_str());
    }
-
-   signal(SIGQUIT, cleanup);
-   signal(SIGTERM, cleanup);
-   signal(SIGINT, cleanup);
-   signal(SIGWINCH, resize);
 
    if (gUseTui)
       gDisplay = new SpewTui(gIterationsToDo, gUnits, gProgress, gVerbosity);
