@@ -57,7 +57,7 @@ using namespace std;
 #include "SpewConsole.h"
 #include "SpewTui.h"
 #include "TransferInfoList.h"
-#include "CumulativeStatistics.h"
+#include "CumulativeStatisticsReadWrite.h"
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -135,7 +135,7 @@ bool gUseStdRcFiles = true;
 Log *gLogger = (Log *)NULL;
 capacity_t gJobId = 0;
 SpewDisplay *gDisplay = (SpewDisplay *)NULL; 
-CumulativeStatistics gCumStats;
+CumulativeStatisticsReadWrite gCumStats;
 TimeHack gProgramStartTime;
 unsigned int gFoundTransferErrors = 0;
 
@@ -157,7 +157,7 @@ void end_statistics(const CumulativeStatistics &cumStats);
 int run_transfers(Job &job, 
                   capacity_t numTransfers, 
                   bool continueAfterError,
-                  CumulativeStatistics &cumStats);
+                  CumulativeStatisticsReadWrite &cumStats);
 void run_job(Job *job,
              CumulativeStatistics &cumStats);
 void run_jobs(operation_enum operation, CumulativeStatistics &cumStats);
@@ -1117,7 +1117,7 @@ void end_statistics(const CumulativeStatistics &cumStats)
 int run_transfers(Job *job, 
                   capacity_t numTransfers, 
                   bool continueAfterError,
-                  CumulativeStatistics &cumStats)
+                  CumulativeStatisticsReadWrite &cumStats)
 {
    int ret;
 
@@ -1140,7 +1140,7 @@ int run_transfers(Job *job,
 
 
 //////////////////////////  run_job()  ////////////////////////////////////////
-void run_job(Job *job, CumulativeStatistics &cumStats)
+void run_job(Job *job, CumulativeStatisticsReadWrite &cumStats)
 {
    int ret;
    capacity_t startingVerticalHacks = gDisplay->getCurrentNumVerticalHacks();
@@ -1385,7 +1385,8 @@ void run_job(Job *job, CumulativeStatistics &cumStats)
 
 
 //////////////////////////  run_jobs()  ///////////////////////////////////////
-void run_jobs(operation_enum operation, CumulativeStatistics &cumStats)
+void run_jobs(operation_enum operation, 
+              CumulativeStatisticsReadWrite &cumStats)
 {
    int ret;
 

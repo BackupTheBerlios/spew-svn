@@ -3,7 +3,7 @@ noinst_LIBRARIES = libcommon.a libtui.a
 
 libcommon_a_SOURCES = \
         common.cpp common.h \
-	TimeHack.cpp TimeHack.h \
+        TimeHack.cpp TimeHack.h \
         Job.cpp Job.h \
         Log.cpp Log.h \
         Random.cpp Random.h \
@@ -15,14 +15,16 @@ libcommon_a_SOURCES = \
         NumbersTransfer.cpp NumbersTransfer.h \
         RandomTransfer.cpp RandomTransfer.h \
         ZerosTransfer.cpp ZerosTransfer.h \
-	TransferInfo.cpp TransferInfo.h \
-	TransferInfoList.cpp TransferInfoList.h \
-	TransferInfoListFactory.cpp TransferInfoListFactory.h \
-	RandomTransferInfoList.cpp RandomTransferInfoList.h \
-	SequentialTransferInfoList.cpp SequentialTransferInfoList.h \
-	Statistics.cpp Statistics.h \
-	CumulativeStatistics.cpp CumulativeStatistics.h \
-	JobStatistics.cpp JobStatistics.h 
+        TransferInfo.cpp TransferInfo.h \
+        TransferInfoList.cpp TransferInfoList.h \
+        TransferInfoListFactory.cpp TransferInfoListFactory.h \
+        RandomTransferInfoList.cpp RandomTransferInfoList.h \
+        SequentialTransferInfoList.cpp SequentialTransferInfoList.h \
+        Statistics.cpp Statistics.h \
+        CumulativeStatistics.cpp CumulativeStatistics.h \
+        CumulativeStatisticsReadOnly.cpp CumulativeStatisticsReadOnly.h \
+        CumulativeStatisticsReadWrite.cpp CumulativeStatisticsReadWrite.h \
+        JobStatistics.cpp JobStatistics.h 
 
 libtui_a_SOURCES = \
         Tui.cpp Tui.h
@@ -43,5 +45,5 @@ spew_SOURCES = spew.cpp \
 spew_LDFLAGS = $(STATIC_LINK)
 
 install-exec-local:
-	(cd $(DESTDIR)$(bindir) && $(LN_S) -f spew gorge)
-	(cd $(DESTDIR)$(bindir) && $(LN_S) -f spew regorge)
+        (cd $(DESTDIR)$(bindir) && $(LN_S) -f spew gorge)
+        (cd $(DESTDIR)$(bindir) && $(LN_S) -f spew regorge)

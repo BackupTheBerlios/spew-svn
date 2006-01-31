@@ -38,42 +38,21 @@ public:
 
    void init();
    
-   unsigned int getIterations() const { return mIterations; };
-   void setIterations(unsigned int iter) { mIterations = iter; };
-   void incIterations() { mIterations++; };
-   
-   TimeHack getTotalReadTransferTime() const { return mTotalReadTransferTime; };
-   void setTotalReadTransferTime(const TimeHack &hack) { mTotalReadTransferTime = hack; };
-   void addToTotalReadTransferTime(const TimeHack &hack) { mTotalReadTransferTime += hack; };
-
-   TimeHack getTotalWriteTransferTime() const { return mTotalWriteTransferTime; };
-   void setTotalWriteTransferTime(const TimeHack &hack) { mTotalWriteTransferTime = hack; };
-   void addToTotalWriteTransferTime(const TimeHack &hack) { mTotalWriteTransferTime += hack; };
-
-   capacity_t getTotalBytesRead() const { return mTotalBytesRead; };
-   void setTotalBytesRead(capacity_t bytes) { mTotalBytesRead = bytes; };
-   void addToTotalBytesRead(capacity_t bytes) { mTotalBytesRead += bytes; };
-
-
-   capacity_t getTotalBytesWritten() const { return mTotalBytesWritten; };
-   void setTotalBytesWritten(capacity_t bytes) { mTotalBytesWritten = bytes; };
-   void addToTotalBytesWritten(capacity_t bytes) { mTotalBytesWritten += bytes; };
-
-   capacity_t getTotalReadOps() const { return mTotalReadOps; };
-   void setTotalReadOps(capacity_t ops) { mTotalReadOps = ops; };
-   void addToTotalReadOps(capacity_t ops) { mTotalReadOps += ops; };
-
-   capacity_t getTotalWriteOps() const { return mTotalWriteOps; };
-   void setTotalWriteOps(capacity_t ops) { mTotalWriteOps = ops; };
-   void addToTotalWriteOps(capacity_t ops) { mTotalWriteOps += ops; };
-
-   ~CumulativeStatistics();
+   virtual unsigned int getIterations() const = 0;
+   virtual TimeHack getTotalReadTransferTime() const = 0;
+   virtual TimeHack getTotalWriteTransferTime() const = 0;
+   virtual capacity_t getTotalBytesRead() const = 0;
+   virtual capacity_t getTotalBytesWritten() const = 0;
+   virtual capacity_t getTotalReadOps() const = 0;
+   virtual capacity_t getTotalWriteOps() const = 0;
+ 
+   virtual ~CumulativeStatistics();
 
 private:
    CumulativeStatistics(const CumulativeStatistics& stats);
    CumulativeStatistics& operator=(const CumulativeStatistics &rhs);
 
-private:
+protected:
    unsigned int mIterations;
    TimeHack mTotalReadTransferTime;
    TimeHack mTotalWriteTransferTime;
