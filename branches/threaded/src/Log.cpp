@@ -46,9 +46,9 @@ int LOGFILE_WIDTH = 80;
 //////////////////////////  Log::threadEntryPoint()  //////////////////////////
 void *Log::doWork(void *pthis)
 {
-	sigset_t sigsToBlock;
-	sigfillset(&sigsToBlock);
-	pthread_sigmask(SIG_BLOCK, &sigsToBlock, NULL);
+   sigset_t sigsToBlock;
+   sigfillset(&sigsToBlock);
+   pthread_sigmask(SIG_BLOCK, &sigsToBlock, NULL);
 
    const Log *log = (Log *)pthis;
    unsigned int queueLen;
@@ -135,6 +135,7 @@ int Log::stopThread()
 
    pthread_mutex_lock(&mMsgQueueMutex);
    mShutdown = true;
+   pthread_cond_signal(&mMsgQueueNotEmpty);
    pthread_mutex_unlock(&mMsgQueueMutex);
    if ((ret = pthread_join(*mThread, (void **)NULL)) != 0)
        return ret;
