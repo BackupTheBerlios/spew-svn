@@ -24,7 +24,9 @@ libcommon_a_SOURCES = \
         CumulativeStatistics.cpp CumulativeStatistics.h \
         CumulativeStatisticsReadOnly.cpp CumulativeStatisticsReadOnly.h \
         CumulativeStatisticsReadWrite.cpp CumulativeStatisticsReadWrite.h \
-        JobStatistics.cpp JobStatistics.h 
+	JobStatistics.cpp JobStatistics.h \
+	JobStatisticsReadOnly.cpp JobStatisticsReadOnly.h \
+	JobStatisticsReadWrite.cpp JobStatisticsReadWrite.h 
 
 libtui_a_SOURCES = \
         Tui.cpp Tui.h
@@ -45,5 +47,5 @@ spew_SOURCES = spew.cpp \
 spew_LDFLAGS = $(STATIC_LINK)
 
 install-exec-local:
-        (cd $(DESTDIR)$(bindir) && $(LN_S) -f spew gorge)
-        (cd $(DESTDIR)$(bindir) && $(LN_S) -f spew regorge)
+	(cd $(DESTDIR)$(bindir) && $(LN_S) -f spew gorge)
+	(cd $(DESTDIR)$(bindir) && $(LN_S) -f spew regorge)

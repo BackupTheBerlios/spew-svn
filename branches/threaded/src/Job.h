@@ -28,7 +28,7 @@
 
 #include "common.h"
 #include "Log.h"
-#include "JobStatistics.h"
+#include "JobStatisticsReadWrite.h"
 #include "TimeHack.h"
 #include "Transfer.h"
 #include "TransferInfo.h"
@@ -141,7 +141,7 @@ protected:
    capacity_t mJobId;  
 
 protected:
-   JobStatistics *mStats;
+   JobStatisticsReadWrite *mStats;
    TransferInfoList *mTransferInfoList;  
 
 };

@@ -37,44 +37,25 @@ public:
    JobStatistics();
    JobStatistics(const JobStatistics &rhs);
 
-   void init();
+   virtual void init();
    
-   TimeHack getJobStartTime() const { return mJobStartTime; };
-   void setJobStartTime() { mJobStartTime.setTimeNow(); };
-   TimeHack getJobEndTime() const { return mJobEndTime; };
-   void setJobEndTime() { mJobEndTime.setTimeNow(); };
-
-   capacity_t getJobBytesTransferred() const { return mJobBytesTransferred; };
-   void setJobBytesTransferred(capacity_t bytes) { mJobBytesTransferred = bytes; };
-   void addToJobBytesTransferred(capacity_t bytes) { mJobBytesTransferred += bytes; };
-
-   TimeHack getHackRowStartTime() const { return mHackRowStartTime; };
-   void setHackRowStartTime() { mHackRowStartTime.setTimeNow(); };
-   TimeHack getHackRowEndTime() const { return mHackRowEndTime; };
-   void setHackRowEndTime() { mHackRowEndTime.setTimeNow(); };
-   capacity_t getHackRowBytesTransferred() const { return mHackRowBytesTransferred; };
-   void setHackRowBytesTransferred(capacity_t bytes) { mHackRowBytesTransferred = bytes; };
-   void addToHackRowBytesTransferred(capacity_t bytes) { mHackRowBytesTransferred += bytes; };
-
-   TimeHack getTransferStartTime() const { return mTransferStartTime; };
-   void setTransferStartTime() { mTransferStartTime.setTimeNow(); };
-   TimeHack getTransferEndTime() const { return mTransferEndTime; };
-   void setTransferEndTime() { mTransferEndTime.setTimeNow(); };
-   capacity_t getTransferBytesTransferred() const { return mTransferBytesTransferred; };
-   void setTransferBytesTransferred(capacity_t bytes) { mTransferBytesTransferred = bytes; };
-   void addToTransferBytesTransferred(capacity_t bytes) { mTransferBytesTransferred += bytes; };
-
-
-   capacity_t getNumTransfersWithDataIntegrityErrors() const { return mNumTransfersWithDataIntegrityErrors; };
-   void setNumTransfersWithDataIntegrityErrors(capacity_t errors) { mNumTransfersWithDataIntegrityErrors = errors; };
-   void incNumTransfersWithDataIntegrityErrors() { mNumTransfersWithDataIntegrityErrors++; };
+   virtual TimeHack getJobStartTime() const = 0;
+   virtual TimeHack getJobEndTime() const = 0;
+   virtual capacity_t getJobBytesTransferred() const = 0;
+   virtual TimeHack getHackRowStartTime() const = 0;
+   virtual TimeHack getHackRowEndTime() const = 0;
+   virtual capacity_t getHackRowBytesTransferred() const = 0;
+   virtual TimeHack getTransferStartTime() const = 0;
+   virtual TimeHack getTransferEndTime() const = 0;
+   virtual capacity_t getTransferBytesTransferred() const = 0;
+   virtual capacity_t getNumTransfersWithDataIntegrityErrors() const = 0;
 
    virtual ~JobStatistics();
 
 private:
    JobStatistics& operator=(const JobStatistics &rhs);
 
-private:
+protected:
    TimeHack mJobStartTime;
    TimeHack mJobEndTime;
    capacity_t mJobBytesTransferred;

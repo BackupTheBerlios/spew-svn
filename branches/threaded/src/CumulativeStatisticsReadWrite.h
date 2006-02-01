@@ -83,8 +83,8 @@ protected:
    void lock() const;
    void unlock() const;
 #else
-   void lock() {};
-   void unlock() {};
+   void lock() const {};
+   void unlock() const {};
 #endif
 
 protected:

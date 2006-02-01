@@ -92,7 +92,7 @@ int Job::init()
    mBuffer = PTR_ALIGN(mRealBuffer, pageSize);
 
    // Initialize statistics.
-   mStats = new JobStatistics();
+   mStats = new JobStatisticsReadWrite();
    if (!mStats)
    {
       mLastErrorMsg = "Cannot allocate memory.\n";
