@@ -39,8 +39,9 @@ RandomTransfer::RandomTransfer(Log &logger,
                                unsigned char *buffer, 
                                capacity_t bufferSize,
                                capacity_t id,
-                               u32_t seed) : 
-   Transfer(logger, fd, buffer, bufferSize, id)
+                               u32_t seed,
+										 IoDirection_t direction) : 
+   Transfer(logger, fd, buffer, bufferSize, id, direction)
 {
    mRnd.setSeed(seed);
 }

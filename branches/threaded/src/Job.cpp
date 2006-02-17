@@ -72,7 +72,7 @@ Job::Job(Log &logger,
    mRealBuffer = (unsigned char *)NULL;
    mBuffer = (unsigned char *)NULL;
    mLastErrorMsg = "";
-   mRunningHackRow = false;
+   mRunningInterval = false;
 }
 
 
@@ -134,7 +134,11 @@ capacity_t Job::getTotalNumberOfTransfers() const
 /////////////////////////  Job::startJob()  ///////////////////////////////////
 int Job::startJob()
 {
+   int rtn;
+
    mStats->init();
+   mStats->setBytesInJob(mTransferSize);
+
    return EXIT_OK;
 }
 
@@ -142,6 +146,8 @@ int Job::startJob()
 /////////////////////////  Job::finishJob()  //////////////////////////////////
 int Job::finishJob()
 {
+   int rtn = EXIT_OK;
+
    if (mRealBuffer != (unsigned char*)NULL)
    {
       free(mRealBuffer);
@@ -149,7 +155,7 @@ int Job::finishJob()
       mBuffer = (unsigned char*)NULL;
    }
 
-   return EXIT_OK;
+   return rtn;
 }
 
 
@@ -195,65 +201,65 @@ TimeHack::timehack_t Job::getTotalJobTime() const
 }
 
 
-/////////////////////////  Job::setHackRowStartTime()  ////////////////////////
-void Job::setHackRowStartTime()
+/////////////////////////  Job::setIntervalStartTime()  ///////////////////////
+void Job::setIntervalStartTime()
 {
-   mStats->setHackRowStartTime();
+   mStats->setIntervalStartTime();
 }
 
 
-////////////////////////  Job::getHackRowStartTime()  /////////////////////////
-TimeHack::timehack_t Job::getHackRowStartTime() const
+////////////////////////  Job::getIntervalStartTime()  ////////////////////////
+TimeHack::timehack_t Job::getIntervalStartTime() const
 {
-   return mStats->getHackRowStartTime().getTime();
+   return mStats->getIntervalStartTime().getTime();
 }
 
 
-/////////////////////////  Job::setHackRowEndTime()  //////////////////////////
-void Job::setHackRowEndTime()
+/////////////////////////  Job::setIntervalEndTime()  /////////////////////////
+void Job::setIntervalEndTime()
 {
-   mStats->setHackRowEndTime();
+   mStats->setIntervalEndTime();
 }
 
 
-/////////////////////////  Job::getHackRowEndTime()  //////////////////////////
-TimeHack::timehack_t Job::getHackRowEndTime() const
+/////////////////////////  Job::getIntervalEndTime()  /////////////////////////
+TimeHack::timehack_t Job::getIntervalEndTime() const
 {
-   return mStats->getHackRowEndTime().getTime();
+   return mStats->getIntervalEndTime().getTime();
 }
 
 
-/////////////////////////  Job::getHackRowElapsedTime()  //////////////////////
-TimeHack::timehack_t Job::getHackRowElapsedTime() const
+/////////////////////////  Job::getIntervalElapsedTime()  /////////////////////
+TimeHack::timehack_t Job::getIntervalElapsedTime() const
 {
 
-   return TimeHack::getCurrentTime() - this->getHackRowStartTime();
+   return TimeHack::getCurrentTime() - this->getIntervalStartTime();
 }
 
 
-/////////////////////////  Job::getTotalHackRowTime()  ////////////////////////
-TimeHack::timehack_t Job::getTotalHackRowTime() const
+/////////////////////////  Job::getTotalIntervalTime()  ///////////////////////
+TimeHack::timehack_t Job::getTotalIntervalTime() const
 {
-   return mStats->getHackRowEndTime().getTime() - mStats->getHackRowStartTime().getTime();
+   return mStats->getIntervalEndTime().getTime() - mStats->getIntervalStartTime().getTime();
 }
 
 
-/////////////////////////  Job::startHackRow()  ///////////////////////////////
-int Job::startHackRow()
+/////////////////////////  Job::startInterval()  //////////////////////////////
+int Job::startInterval()
 {
-   mRunningHackRow = true;
-   mStats->setHackRowBytesTransferred(0);
-   this->setHackRowStartTime();
+   mRunningInterval = true;
+   mStats->setIntervalBytesTransferred(0);
+   this->setIntervalStartTime();
 
    return EXIT_OK;
 }
 
 
-/////////////////////////  Job::endHackRow()  /////////////////////////////////
-int Job::endHackRow()
+/////////////////////////  Job::endInterval()  ////////////////////////////////
+int Job::endInterval()
 {
-   this->setHackRowEndTime();
-   mRunningHackRow = false;
+   this->setIntervalEndTime();
+   mRunningInterval = false;
 
    return EXIT_OK;
 }
@@ -284,6 +290,57 @@ void Job::setTransferEndTime()
 TimeHack::timehack_t Job::getTransferEndTime() const
 {
    return mStats->getTransferEndTime().getTime();
+}
+
+
+/////////////////////////  Job::runTransfers()  ///////////////////////////////
+int Job::runTransfers(capacity_t numTransfers, bool continueAfterError)
+{
+   this->setTransferStartTime();
+   mStats->setTransferBytesTransferred(0);
+   int exitCode = EXIT_OK;
+   for (capacity_t i = 0LLU; i < numTransfers; i++)
+   {
+      const TransferInfo *nextTransfer = mTransferInfoList->next();
+      if (!nextTransfer)
+      {
+         mLastErrorMsg += "Fatal internal error - no transfers left to process.";
+         return EXIT_ERROR_ILLEGAL_OPERATION;
+      }
+      int ret = mTransfer->io(*nextTransfer, mLastErrorMsg);
+      capacity_t transferSize = nextTransfer->getSize();
+      switch (ret)
+      {
+      case EXIT_OK:
+         mStats->addToJobBytesTransferred(transferSize);
+         mStats->addToTransferBytesTransferred(transferSize);
+         if (mRunningInterval)
+            mStats->addToIntervalBytesTransferred(transferSize);
+         break;
+      case EXIT_ERROR_DATA_INTEGRITY:
+         exitCode = EXIT_ERROR_DATA_INTEGRITY;
+         if (continueAfterError)
+         {
+            mStats->incNumTransfersWithDataIntegrityErrors();
+            mLogger.logError(mLastErrorMsg.c_str());
+         }
+         else
+         {
+            mLastErrorMsg += "More data integrity errors may exist in other parts of the file.";
+            return EXIT_ERROR_DATA_INTEGRITY;
+         }
+         break;
+      default:
+         exitCode = ret;
+         return exitCode;
+         break;
+      }
+   }
+   this->setTransferEndTime();
+   if (mStats->getNumTransfersWithDataIntegrityErrors())
+      return EXIT_ERROR_DATA_INTEGRITY;
+   else
+      return exitCode;
 }
 
 

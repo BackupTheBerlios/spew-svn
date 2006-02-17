@@ -545,7 +545,7 @@ string& Log::justify(string& str,
 }
 
 
-//////////////////////////  Log::submit()  ////////////////////////////////////
+//////////////////////////  Log::submitWork()  ////////////////////////////////
 void Log::submitWork(unsigned int outputDevice, const char *msg) const
 {
    if (!outputDevice || strlen(msg) == 0)

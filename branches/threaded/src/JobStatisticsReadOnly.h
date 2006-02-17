@@ -42,10 +42,11 @@ public:
    
    virtual TimeHack getJobStartTime() const { return mJobStartTime; };
    virtual TimeHack getJobEndTime() const { return mJobEndTime; };
+	capacity_t getBytesInJob() const { return mBytesInJob; }
    virtual capacity_t getJobBytesTransferred() const { return mJobBytesTransferred; };
-   virtual TimeHack getHackRowStartTime() const { return mHackRowStartTime; };
-   virtual TimeHack getHackRowEndTime() const { return mHackRowEndTime; };
-   virtual capacity_t getHackRowBytesTransferred() const { return mHackRowBytesTransferred; };
+   virtual TimeHack getIntervalStartTime() const { return mIntervalStartTime; };
+   virtual TimeHack getIntervalEndTime() const { return mIntervalEndTime; };
+   virtual capacity_t getIntervalBytesTransferred() const { return mIntervalBytesTransferred; };
    virtual TimeHack getTransferStartTime() const { return mTransferStartTime; };
    virtual TimeHack getTransferEndTime() const { return mTransferEndTime; };
    virtual capacity_t getTransferBytesTransferred() const { return mTransferBytesTransferred; };

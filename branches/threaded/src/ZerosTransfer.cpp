@@ -38,8 +38,9 @@ ZerosTransfer::ZerosTransfer(Log &logger,
                              int fd, 
                              unsigned char *buffer, 
                              capacity_t bufferSize,
-                             pid_t pid) : 
-   Transfer(logger, fd, buffer, bufferSize, pid)
+                             pid_t pid,
+									  IoDirection_t direction) : 
+   Transfer(logger, fd, buffer, bufferSize, pid, direction)
 {
    // Zero out buffer.  This buffer will not change during writes. 
    memset(mBuffer, 0, mMaxBufferSize);

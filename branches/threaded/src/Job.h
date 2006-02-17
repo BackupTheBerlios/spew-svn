@@ -88,15 +88,15 @@ public:
    virtual int startJob() = 0;
    virtual int finishJob() = 0;
 
-   void setHackRowStartTime();
-   TimeHack::timehack_t getHackRowStartTime() const;
-   void setHackRowEndTime();
-   TimeHack::timehack_t getHackRowEndTime() const;
-   TimeHack::timehack_t getHackRowElapsedTime() const;
-   TimeHack::timehack_t getTotalHackRowTime() const;
-   capacity_t getHackRowBytesTransferred() const { return mStats->getHackRowBytesTransferred(); };
-   virtual int startHackRow();
-   virtual int endHackRow();
+   void setIntervalStartTime();
+   TimeHack::timehack_t getIntervalStartTime() const;
+   void setIntervalEndTime();
+   TimeHack::timehack_t getIntervalEndTime() const;
+   TimeHack::timehack_t getIntervalElapsedTime() const;
+   TimeHack::timehack_t getTotalIntervalTime() const;
+   capacity_t getIntervalBytesTransferred() const { return mStats->getIntervalBytesTransferred(); };
+   virtual int startInterval();
+   virtual int endInterval();
 
    void setTransferStartTime();
    TimeHack::timehack_t getTransferStartTime() const;
@@ -106,7 +106,7 @@ public:
 
    string getLastErrorMessage() const { return mLastErrorMsg; };
    virtual int runTransfers(capacity_t numTransfers, 
-                            bool continueAfterError) = 0;
+                            bool continueAfterError);
    const JobStatistics *getStatistics() const { return mStats; };
 
    virtual ~Job();
@@ -136,13 +136,20 @@ protected:
    unsigned char *mBuffer;        // Page-aligned pointer to mRealBuffer.
 
 
-   bool mRunningHackRow;
+   bool mRunningInterval;
    string mLastErrorMsg;          // Holds last reported error message.
    capacity_t mJobId;  
 
 protected:
    JobStatisticsReadWrite *mStats;
    TransferInfoList *mTransferInfoList;  
+
+#ifdef USE_THREADS
+   pthread_t *mThread;
+   mutable pthread_mutex_t mQueueMutex;
+   mutable pthread_cond_t mQueueNotEmpty;
+   mutable bool mShutdown;                   // Protect with mutex
+#endif // USE_THREADS
 
 };
 

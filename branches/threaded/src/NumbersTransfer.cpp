@@ -38,8 +38,9 @@ NumbersTransfer::NumbersTransfer(Log &logger,
                                  int fd, 
                                  unsigned char *buffer, 
                                  capacity_t bufferSize,
-                                 capacity_t id) : 
-   Transfer(logger, fd, buffer, bufferSize, id)
+                                 capacity_t id,
+											IoDirection_t direction) : 
+   Transfer(logger, fd, buffer, bufferSize, id, direction)
 {
 }
 

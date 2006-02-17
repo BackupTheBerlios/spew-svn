@@ -36,12 +36,18 @@
 #define PTR_ALIGN(Ptr, M) ((Ptr) \
                            + ROUND_UP_OFFSET ((char *)(Ptr) - (char *)0, (M)))
 
-#ifndef max
-#define max(X,Y) ((X) >= (Y) ? (X) : (Y))
+#ifndef MAX
+#define MAX(X,Y) ((X) >= (Y) ? (X) : (Y))
 #endif
+
 
 #define STRINGIFY(s) #s
 #define QUOTE(s) STRINGIFY(s)
+
+
+#define SPEW_TRACE()																	\
+	do { fprintf(stderr, "%s:%s:%d\n", __FILE__, __FUNCTION__, __LINE__); } while (0)
+
 
 //////////////////////////////////////////////////////////////////////////////
 ///////////////////////////  Typedefs  ///////////////////////////////////////
@@ -119,5 +125,6 @@ const char *getTransferRateUnitsStr(Units_t units);
 void localTime(const time_t *timep, struct tm *result);
 int strPrintf(string &str, const char *format, ...);
 int strnPrintf(string &str, const char *format, ...);
+
 
 #endif // COMMON_H

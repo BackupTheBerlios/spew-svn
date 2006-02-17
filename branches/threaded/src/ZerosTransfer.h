@@ -39,7 +39,8 @@ public:
                  int fd, 
                  unsigned char *buffer, 
                  capacity_t bufferSize,
-                 pid_t pid);
+                 pid_t pid,
+					  IoDirection_t direction);
              
    virtual int read(const TransferInfo &transInfo, string &errorMsg);
    virtual int write(const TransferInfo &transInfo, string &errorMsg);

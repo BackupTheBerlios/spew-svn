@@ -218,8 +218,8 @@ int SpewTui::resize()
 }
 
 
-//////////////////////////  SpewTui::getCurrentNumHackRows()  /////////////////
-unsigned int SpewTui::getCurrentNumHackRows() const
+//////////////////////////  SpewTui::getCurrentProgressRows()  ////////////////
+unsigned int SpewTui::getCurrentProgressRows() const
 {
    if (mShowProgress)
       return mProgressWindow->getCurrentNumHackRows();
@@ -228,26 +228,12 @@ unsigned int SpewTui::getCurrentNumHackRows() const
 }
 
 
-////////////////  SpewTui::getCurrentNumVerticalHacks()  //////////////////////
-unsigned int SpewTui::getCurrentNumVerticalHacks() const 
-{
-   return this->getCurrentNumHackRows();
-} 
-
-
-//////////////////////////  SpewTui::getCurrentNumHackColumns()  //////////////
-unsigned int SpewTui::getCurrentNumHackColumns() const
+//////////////////////////  SpewTui::getCurrentProgressColumns()  /////////////
+unsigned int SpewTui::getCurrentProgressColumns() const
 {
    if (mShowProgress)
       return mProgressWindow->getCurrentNumHackColumns();
    return 1;
-}
-
-
-////////////////  SpewTui::getCurrentNumHorizontalHacks()  ////////////////////
-unsigned int SpewTui::getCurrentNumHorizontalHacks() const 
-{
-   return this->getCurrentNumHackColumns();
 }
 
 
@@ -329,8 +315,8 @@ void SpewTui::noEndHack()
 }
 
 
-//////////////////////////  SpewTui::nextHackRow()  ///////////////////////////
-void SpewTui::nextHackRow()
+//////////////////////////  SpewTui::nextProgressRow()  ///////////////////////
+void SpewTui::nextProgressRow()
 {
    if (!mShowProgress)
       return;
@@ -342,51 +328,52 @@ void SpewTui::nextHackRow()
 
 
 ////////////////////  SpewTui::intermediateStatistics()  //////////////////////
-void SpewTui::intermediateStatistics(const JobStatistics &jobStats,
-                                     const CumulativeStatistics &cumStats,
-                                     capacity_t bytesInJob,
+void SpewTui::intermediateStatistics(const JobStatistics *jobStats,
+                                     const CumulativeStatistics *cumStats,
                                      const TimeHack& currentTime,
-                                     const TimeHack& totalRunTime)
+                                     const TimeHack& startTime)
 {
-   long double percentage = (long double)jobStats.getJobBytesTransferred()/(long double)bytesInJob*100.0;
-   TimeHack hackRowTransferTime = jobStats.getHackRowEndTime() - jobStats.getHackRowStartTime();
+   long double percentage = (long double)jobStats->getJobBytesTransferred()/(long double)jobStats->getBytesInJob()*100.0;
+   TimeHack progressRowTransferTime = jobStats->getIntervalEndTime() - jobStats->getIntervalStartTime();
+   TimeHack runTime(currentTime);
+   runTime -= startTime;
    TimeHack jobTransferTime(currentTime);
-   jobTransferTime -= jobStats.getJobStartTime();
+   jobTransferTime -= jobStats->getJobStartTime();
 
    if (mShowProgress)
    {
       mProgressWindow->currentTransferPercentage(percentage);
-      mProgressWindow->currentTransferRate(jobStats.getHackRowBytesTransferred(), hackRowTransferTime.getTime());
+      mProgressWindow->currentTransferRate(jobStats->getIntervalBytesTransferred(), progressRowTransferTime.getTime());
       mProgressWindow->refresh();
    }
 
-   mStatsWindow->setJobBytesTransferred(jobStats.getJobBytesTransferred());
+   mStatsWindow->setJobBytesTransferred(jobStats->getJobBytesTransferred());
    mStatsWindow->setJobTransferTime(jobTransferTime);
-   mStatsWindow->setBytesInJob(bytesInJob);
-   mStatsWindow->setTotalBytesRead(cumStats.getTotalBytesRead());
-   mStatsWindow->setTotalReadTransferTime(cumStats.getTotalReadTransferTime());
-   mStatsWindow->setTotalBytesWritten(cumStats.getTotalBytesWritten());
-   mStatsWindow->setTotalWriteTransferTime(cumStats.getTotalWriteTransferTime());
-   mStatsWindow->setTotalRunTime(totalRunTime);
+   mStatsWindow->setBytesInJob(jobStats->getBytesInJob());
+   mStatsWindow->setTotalBytesRead(cumStats->getTotalBytesRead());
+   mStatsWindow->setTotalReadTransferTime(cumStats->getTotalReadTransferTime());
+   mStatsWindow->setTotalBytesWritten(cumStats->getTotalBytesWritten());
+   mStatsWindow->setTotalWriteTransferTime(cumStats->getTotalWriteTransferTime());
+   mStatsWindow->setTotalRunTime(runTime);
    mStatsWindow->refresh();
 
    this->checkKeyboard();
 }
 
 /////////////////////  SpewTui::cumulativeStatistics() ////////////////////////
-void SpewTui::cumulativeStatistics(const JobStatistics &jobStats,
-                                   const CumulativeStatistics &cumStats,
+void SpewTui::cumulativeStatistics(const JobStatistics *jobStats,
+                                   const CumulativeStatistics *cumStats,
                                    const TimeHack& totalRunTime)
 {
 
-   TimeHack jobTransferTime = jobStats.getJobEndTime() - jobStats.getJobStartTime();
+   TimeHack jobTransferTime = jobStats->getJobEndTime() - jobStats->getJobStartTime();
 
-   mStatsWindow->setJobBytesTransferred(jobStats.getJobBytesTransferred());
+   mStatsWindow->setJobBytesTransferred(jobStats->getJobBytesTransferred());
    mStatsWindow->setJobTransferTime(jobTransferTime);
-   mStatsWindow->setTotalBytesRead(cumStats.getTotalBytesRead());
-   mStatsWindow->setTotalReadTransferTime(cumStats.getTotalReadTransferTime());
-   mStatsWindow->setTotalBytesWritten(cumStats.getTotalBytesWritten());
-   mStatsWindow->setTotalWriteTransferTime(cumStats.getTotalWriteTransferTime());
+   mStatsWindow->setTotalBytesRead(cumStats->getTotalBytesRead());
+   mStatsWindow->setTotalReadTransferTime(cumStats->getTotalReadTransferTime());
+   mStatsWindow->setTotalBytesWritten(cumStats->getTotalBytesWritten());
+   mStatsWindow->setTotalWriteTransferTime(cumStats->getTotalWriteTransferTime());
    mStatsWindow->setTotalRunTime(totalRunTime);
    mStatsWindow->refresh();
 
@@ -395,8 +382,10 @@ void SpewTui::cumulativeStatistics(const JobStatistics &jobStats,
 
 
 //////////////////////////  SpewTui::startRun()  //////////////////////////////
-void SpewTui::startRun()
+void SpewTui::startRun(const TimeHack &startTime)
 {
+   SpewDisplay::startRun(startTime);
+
    mStatusWindow->startRun();
    mStatsWindow->startRun();
    if (mShowProgress)

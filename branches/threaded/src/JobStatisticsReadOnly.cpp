@@ -42,11 +42,12 @@ JobStatisticsReadOnly::JobStatisticsReadOnly(const JobStatisticsReadOnly &rhs)
 {
    mJobStartTime = rhs.mJobStartTime;
    mJobEndTime = rhs.mJobEndTime;
+	mBytesInJob = rhs.mBytesInJob;
    mJobBytesTransferred = rhs.mJobBytesTransferred;
 
-   mHackRowStartTime = rhs.mHackRowStartTime;
-   mHackRowEndTime = rhs.mHackRowEndTime;
-   mHackRowBytesTransferred = rhs.mHackRowBytesTransferred;
+   mIntervalStartTime = rhs.mIntervalStartTime;
+   mIntervalEndTime = rhs.mIntervalEndTime;
+   mIntervalBytesTransferred = rhs.mIntervalBytesTransferred;
 
    mTransferStartTime = rhs.mTransferStartTime;
    mTransferEndTime = rhs.mTransferEndTime;
@@ -59,10 +60,7 @@ JobStatisticsReadOnly::JobStatisticsReadOnly(const JobStatisticsReadOnly &rhs)
 ///////////////////  JobStatisticsReadOnly::init()  ///////////////////////////
 void JobStatisticsReadOnly::init()
 {
-   mJobBytesTransferred = 0;
-   mHackRowBytesTransferred = 0;
-   mTransferBytesTransferred = 0;
-   mNumTransfersWithDataIntegrityErrors = 0;
+	JobStatistics::init();
 }
 
 

@@ -45,9 +45,7 @@ public:
    virtual int startJob();
    virtual int finishJob();
 
-   virtual int runTransfers(capacity_t numTransfers, bool continueAfterError);
-
-   ~ReadJob() {};
+   virtual ~ReadJob();
 
 private:
    ReadJob();               // Hide default constructor.

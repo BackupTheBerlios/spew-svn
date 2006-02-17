@@ -49,17 +49,20 @@ public:
    virtual TimeHack getJobEndTime() const;
    virtual void setJobEndTime();
 
+	virtual capacity_t getBytesInJob() const;
+	virtual void setBytesInJob(capacity_t bytes);
+
    virtual capacity_t getJobBytesTransferred() const;
    virtual void setJobBytesTransferred(capacity_t bytes);
    virtual void addToJobBytesTransferred(capacity_t bytes);
 
-   virtual TimeHack getHackRowStartTime() const;
-   virtual void setHackRowStartTime();
-   virtual TimeHack getHackRowEndTime() const;
-   virtual void setHackRowEndTime();
-   virtual capacity_t getHackRowBytesTransferred() const;
-   virtual void setHackRowBytesTransferred(capacity_t bytes);
-   virtual void addToHackRowBytesTransferred(capacity_t bytes);
+   virtual TimeHack getIntervalStartTime() const;
+   virtual void setIntervalStartTime();
+   virtual TimeHack getIntervalEndTime() const;
+   virtual void setIntervalEndTime();
+   virtual capacity_t getIntervalBytesTransferred() const;
+   virtual void setIntervalBytesTransferred(capacity_t bytes);
+   virtual void addToIntervalBytesTransferred(capacity_t bytes);
 
    virtual TimeHack getTransferStartTime() const;
    virtual void setTransferStartTime();

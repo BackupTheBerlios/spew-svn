@@ -41,7 +41,8 @@ Transfer *TransferFactory::createInstance(Log &logger,
                                           unsigned char *buffer, 
                                           capacity_t maxBufferSize,
                                           capacity_t id,
-                                          u64_t seed)
+                                          u64_t seed,
+														IoDirection_t direction)
 {
    Transfer *transferPtr;
    switch (pattern)
@@ -51,21 +52,24 @@ Transfer *TransferFactory::createInstance(Log &logger,
                                         fd, 
                                         buffer, 
                                         maxBufferSize, 
-                                        id);
+                                        id,
+													 direction);
       break;
    case Job::PATTERN_ZEROS:
       transferPtr = new ZerosTransfer(logger,
                                       fd, 
                                       buffer, 
                                       maxBufferSize, 
-                                      id);
+                                      id,
+												  direction);
       break;
    case Job::PATTERN_TRANSFER_NUMBERS:
       transferPtr = new NumbersTransfer(logger,
                                         fd, 
                                         buffer, 
                                         maxBufferSize, 
-                                        id);
+                                        id,
+													 direction);
       break;
    case Job::PATTERN_RANDOM:
       transferPtr = new RandomTransfer(logger,
@@ -73,7 +77,8 @@ Transfer *TransferFactory::createInstance(Log &logger,
                                        buffer, 
                                        maxBufferSize, 
                                        id, 
-                                       seed);
+                                       seed,
+													direction);
       break;
    default:
       transferPtr = 0;

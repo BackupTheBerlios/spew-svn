@@ -70,8 +70,8 @@ public:
 
    virtual unsigned int getCurrentPauseLength() const;
 
-   virtual unsigned int getCurrentNumVerticalHacks() const;
-   virtual unsigned int getCurrentNumHorizontalHacks() const;
+   virtual unsigned int getCurrentProgressRows() const;
+   virtual unsigned int getCurrentProgressColumns() const;
 
    virtual void hack();
    virtual void endHack();
@@ -79,18 +79,17 @@ public:
    virtual void errorEndHack();
    virtual void noHack();
    virtual void noEndHack();
-   virtual void nextHackRow();
+   virtual void nextProgressRow();
 
-   virtual void intermediateStatistics(const JobStatistics &jobStats,
-                                       const CumulativeStatistics &cumStats,
-                                       capacity_t bytesInJob,
+   virtual void intermediateStatistics(const JobStatistics *jobStats,
+                                       const CumulativeStatistics *cumStats,
                                        const TimeHack& currentTime,
                                        const TimeHack& totalRunTime);
-   virtual void cumulativeStatistics(const JobStatistics &jobStats,
-                                     const CumulativeStatistics &cumStats,
+   virtual void cumulativeStatistics(const JobStatistics *jobStats,
+                                     const CumulativeStatistics *cumStats,
                                      const TimeHack& totalRunTime);
 
-   virtual void startRun();
+   virtual void startRun(const TimeHack &startTime);
    virtual void endRun();
    virtual void startJob(unsigned int iteration, IoDirection_t direction);
    virtual void endJob();
@@ -98,10 +97,6 @@ public:
 
 
    ~SpewTui();
-
-protected:
-   virtual unsigned int getCurrentNumHackRows() const;
-   virtual unsigned int getCurrentNumHackColumns() const;
 
 private:
    void setWindowsDimensions(int screenRows, int screenColums);

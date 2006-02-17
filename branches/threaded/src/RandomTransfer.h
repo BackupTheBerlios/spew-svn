@@ -40,7 +40,8 @@ public:
                   unsigned char *buffer, 
                   capacity_t bufferSize,
                   capacity_t id,
-                  u32_t seed);
+                  u32_t seed,
+						IoDirection_t direction);
              
    virtual int read(const TransferInfo &tranInfo, string &errorMsg);
    virtual int write(const TransferInfo &tranInfo, string &errorMsg);

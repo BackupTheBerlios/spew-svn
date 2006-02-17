@@ -41,10 +41,11 @@ public:
    
    virtual TimeHack getJobStartTime() const = 0;
    virtual TimeHack getJobEndTime() const = 0;
+   virtual capacity_t getBytesInJob() const = 0;
    virtual capacity_t getJobBytesTransferred() const = 0;
-   virtual TimeHack getHackRowStartTime() const = 0;
-   virtual TimeHack getHackRowEndTime() const = 0;
-   virtual capacity_t getHackRowBytesTransferred() const = 0;
+   virtual TimeHack getIntervalStartTime() const = 0;
+   virtual TimeHack getIntervalEndTime() const = 0;
+   virtual capacity_t getIntervalBytesTransferred() const = 0;
    virtual TimeHack getTransferStartTime() const = 0;
    virtual TimeHack getTransferEndTime() const = 0;
    virtual capacity_t getTransferBytesTransferred() const = 0;
@@ -58,11 +59,12 @@ private:
 protected:
    TimeHack mJobStartTime;
    TimeHack mJobEndTime;
+   capacity_t mBytesInJob;
    capacity_t mJobBytesTransferred;
 
-   TimeHack mHackRowStartTime;
-   TimeHack mHackRowEndTime;
-   capacity_t mHackRowBytesTransferred;
+   TimeHack mIntervalStartTime;
+   TimeHack mIntervalEndTime;
+   capacity_t mIntervalBytesTransferred;
 
    TimeHack mTransferStartTime;
    TimeHack mTransferEndTime;

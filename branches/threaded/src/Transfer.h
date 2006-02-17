@@ -56,10 +56,12 @@ public:
             int fd, 
             unsigned char *buffer, 
             capacity_t maxBufferSize,
-            capacity_t id);
+            capacity_t id,
+				IoDirection_t direction);
              
    virtual int read(const TransferInfo &tranInfo,  string &errorMsg) = 0;
    virtual int write(const TransferInfo &tranInfo, string &errorMsg) = 0;
+	int io(const TransferInfo &tranInfo, string &errorMsg);
    
 
    virtual ~Transfer() {};
@@ -78,7 +80,7 @@ protected:
    capacity_t mMaxBufferSize;
    capacity_t mCurrentOffset;
    capacity_t mId;
-
+	IoDirection_t mIoDirection;
 };
 
 #endif  // TRANSFER_H

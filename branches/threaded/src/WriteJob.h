@@ -44,9 +44,8 @@ public:
    virtual IoDirection_t getIoDirection() const { return WRITING; };
    virtual int startJob();
    virtual int finishJob();
-   virtual int runTransfers(capacity_t numTransfers, bool continueAfterError);
 
-   ~WriteJob() {};
+   virtual ~WriteJob();
 
 private:
    WriteJob();                // Hide default constructor

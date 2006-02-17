@@ -50,9 +50,9 @@ JobStatisticsReadWrite::JobStatisticsReadWrite(const JobStatisticsReadWrite &rhs
    mJobEndTime = rhs.mJobEndTime;
    mJobBytesTransferred = rhs.mJobBytesTransferred;
 
-   mHackRowStartTime = rhs.mHackRowStartTime;
-   mHackRowEndTime = rhs.mHackRowEndTime;
-   mHackRowBytesTransferred = rhs.mHackRowBytesTransferred;
+   mIntervalStartTime = rhs.mIntervalStartTime;
+   mIntervalEndTime = rhs.mIntervalEndTime;
+   mIntervalBytesTransferred = rhs.mIntervalBytesTransferred;
 
    mTransferStartTime = rhs.mTransferStartTime;
    mTransferEndTime = rhs.mTransferEndTime;
@@ -69,7 +69,7 @@ void JobStatisticsReadWrite::init()
 
    JobStatistics::init();
    mJobBytesTransferred = 0;
-   mHackRowBytesTransferred = 0;
+   mIntervalBytesTransferred = 0;
    mTransferBytesTransferred = 0;
    mNumTransfersWithDataIntegrityErrors = 0;
 
@@ -121,6 +121,28 @@ void JobStatisticsReadWrite::setJobEndTime()
 }
 
 
+///////////////  JobStatisticsReadWrite::getBytesInJob()  /////////////////////
+capacity_t JobStatisticsReadWrite::getBytesInJob() const
+{
+   capacity_t bytes;
+
+   this->lock();
+   bytes = mBytesInJob;
+   this->unlock();
+
+   return bytes;
+}
+
+
+///////////////  JobStatisticsReadWrite::setBytesInJob()  ///////////////////
+void JobStatisticsReadWrite::setBytesInJob(capacity_t bytes)
+{
+   this->lock();
+   mBytesInJob = bytes;
+   this->unlock();
+}
+
+
 ///////////////  JobStatisticsReadWrite::getJobBytesTransferred()  ////////////
 capacity_t JobStatisticsReadWrite::getJobBytesTransferred() const
 {
@@ -152,77 +174,77 @@ void JobStatisticsReadWrite::addToJobBytesTransferred(capacity_t bytes)
 }
 
 
-///////////////  JobStatisticsReadWrite::getHackRowStartTime()  ///////////////
-TimeHack JobStatisticsReadWrite::getHackRowStartTime() const 
+///////////////  JobStatisticsReadWrite::getIntervalStartTime()  //////////////
+TimeHack JobStatisticsReadWrite::getIntervalStartTime() const 
 {
    TimeHack time;
 
    this->lock();
-   time = mHackRowStartTime;
+   time = mIntervalStartTime;
    this->unlock();
 
    return time;
 }
 
 
-///////////////  JobStatisticsReadWrite::setHackRowStartTime()  ///////////////
-void JobStatisticsReadWrite::setHackRowStartTime()
+///////////////  JobStatisticsReadWrite::setIntervalStartTime()  //////////////
+void JobStatisticsReadWrite::setIntervalStartTime()
 {
    this->lock();
-   mHackRowStartTime.setTimeNow(); 
+   mIntervalStartTime.setTimeNow(); 
    this->unlock();
 }
 
 
-///////////////  JobStatisticsReadWrite::getHackRowEndTime()  /////////////////
-TimeHack JobStatisticsReadWrite::getHackRowEndTime() const 
+///////////////  JobStatisticsReadWrite::getIntervalEndTime()  ////////////////
+TimeHack JobStatisticsReadWrite::getIntervalEndTime() const 
 {
    TimeHack time;
 
    this->lock();
-   time = mHackRowEndTime;
+   time = mIntervalEndTime;
    this->unlock();
 
    return time;
 }
 
 
-///////////////  JobStatisticsReadWrite::setHackRowEndTime()  /////////////////
-void JobStatisticsReadWrite::setHackRowEndTime() 
+///////////////  JobStatisticsReadWrite::setIntervalEndTime()  ////////////////
+void JobStatisticsReadWrite::setIntervalEndTime() 
 {
    this->lock();
-   mHackRowEndTime.setTimeNow();
+   mIntervalEndTime.setTimeNow();
    this->unlock();
 }
 
 
-///////////////  JobStatisticsReadWrite::getHackRowBytesTransferred()  ////////
-capacity_t JobStatisticsReadWrite::getHackRowBytesTransferred() const 
+///////////  JobStatisticsReadWrite::getIntervalBytesTransferred()  ///////////
+capacity_t JobStatisticsReadWrite::getIntervalBytesTransferred() const 
 {
    capacity_t bytes;
 
    this->lock();
-   bytes = mHackRowBytesTransferred;
+   bytes = mIntervalBytesTransferred;
    this->unlock();
 
    return bytes;
 }
 
 
-///////////////  JobStatisticsReadWrite::setHackRowBytesTransferred()  ////////
-void JobStatisticsReadWrite::setHackRowBytesTransferred(capacity_t bytes) 
+///////////  JobStatisticsReadWrite::setIntervalBytesTransferred()  ///////////
+void JobStatisticsReadWrite::setIntervalBytesTransferred(capacity_t bytes) 
 {
    this->lock();
-   mHackRowBytesTransferred = bytes;
+   mIntervalBytesTransferred = bytes;
    this->unlock();
 }
 
 
-///////////  JobStatisticsReadWrite::addToHackRowBytesTransferred()  //////////
-void JobStatisticsReadWrite::addToHackRowBytesTransferred(capacity_t bytes)
+///////  JobStatisticsReadWrite::addToIntervalBytesTransferred()  /////////////
+void JobStatisticsReadWrite::addToIntervalBytesTransferred(capacity_t bytes)
 {
    this->lock();
-   mHackRowBytesTransferred += bytes;
+   mIntervalBytesTransferred += bytes;
    this->unlock();
 }
 

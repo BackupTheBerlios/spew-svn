@@ -38,12 +38,14 @@ Transfer::Transfer(Log &logger,
                    int fd, 
                    unsigned char *buffer, 
                    capacity_t maxBufferSize,
-                   capacity_t id) : 
+                   capacity_t id,
+						 IoDirection_t direction) : 
    mLogger(logger),
    mFd(fd),
    mBuffer(buffer), 
    mMaxBufferSize(maxBufferSize),
-   mId(id)
+   mId(id),
+	mIoDirection(direction)
       
 {
    mCurrentOffset = 0;
@@ -113,6 +115,22 @@ int Transfer::write(const TransferInfo &transInfo, string &errorMsg)
    }
 
    return bufferSize - remaining;
+}
+
+
+//////////////////////////  Transfer::io()  //////////////////////////////////
+int Transfer::io(const TransferInfo &transInfo, string &errorMsg)
+{
+	int rtn;
+	switch (mIoDirection)
+	{
+	case READING:
+		rtn = this->read(transInfo, errorMsg);
+		break;
+	case WRITING:
+		rtn = this->write(transInfo, errorMsg);
+	}
+	return rtn;
 }
 
 

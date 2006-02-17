@@ -104,7 +104,8 @@ int ReadJob::startJob()
                                                mBuffer, 
                                                mMaxBufferSize, 
                                                mJobId, 
-                                               mSeed);
+                                               mSeed,
+															  this->getIoDirection());
    if (!mTransfer)
    {
       mLastErrorMsg = strPrintf("Could not allocate memory for transfer.\n"); 
@@ -129,53 +130,7 @@ int ReadJob::finishJob()
 }
 
 
-///////////////////////////  ReadJob::runTransfers()  ////////////////////////
-int ReadJob::runTransfers(capacity_t numTransfers, bool continueAfterError)
+///////////////////////////  ReadJob::~ReadJob()  /////////////////////////////
+ReadJob::~ReadJob()
 {
-
-   this->setTransferStartTime();
-   mStats->setTransferBytesTransferred(0);
-   int exitCode = EXIT_OK;
-   for (capacity_t i = 0LLU; i < numTransfers; i++)
-   {
-      const TransferInfo *nextTransfer = mTransferInfoList->next();
-      if (!nextTransfer)
-      {
-         mLastErrorMsg += "Fatal internal error - no transfers left to process.";
-         return EXIT_ERROR_ILLEGAL_OPERATION;
-      }
-      int ret = mTransfer->read(*nextTransfer, mLastErrorMsg);
-      capacity_t transferSize = nextTransfer->getSize();
-      switch (ret)
-      {
-      case EXIT_OK:
-         mStats->addToJobBytesTransferred(transferSize);
-         mStats->addToTransferBytesTransferred(transferSize);
-         if (mRunningHackRow)
-            mStats->addToHackRowBytesTransferred(transferSize);
-         break;
-      case EXIT_ERROR_DATA_INTEGRITY:
-         exitCode = EXIT_ERROR_DATA_INTEGRITY;
-         if (continueAfterError)
-         {
-            mStats->incNumTransfersWithDataIntegrityErrors();
-            mLogger.logError(mLastErrorMsg.c_str());
-         }
-         else
-         {
-            mLastErrorMsg += "More data integrity errors may exist in other parts of the file.";
-            return EXIT_ERROR_DATA_INTEGRITY;
-         }
-         break;
-      default:
-         exitCode = ret;
-         return exitCode;
-         break;
-      }
-   }
-   this->setTransferEndTime();
-   if (mStats->getNumTransfersWithDataIntegrityErrors())
-      return EXIT_ERROR_DATA_INTEGRITY;
-   else
-      return exitCode;
 }

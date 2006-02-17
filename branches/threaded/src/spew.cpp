@@ -149,18 +149,16 @@ bool parse_options(int argc, const char **argv, string& cmdArgs);
 bool validate_options();
 void end_program(int exitCode);
 void end_program(int exitCode, char *fmt, ...);
-void intermediate_statistics(const Job *job, 
-                             const CumulativeStatistics &cumStats);
 void cumulative_statistics(const Job *job, 
-                           const CumulativeStatistics &cumStats);
-void end_statistics(const CumulativeStatistics &cumStats);
+                           const CumulativeStatistics *cumStats);
+void end_statistics(const CumulativeStatistics *cumStats);
 int run_transfers(Job &job, 
                   capacity_t numTransfers, 
                   bool continueAfterError,
-                  CumulativeStatisticsReadWrite &cumStats);
+                  CumulativeStatisticsReadWrite *cumStats);
 void run_job(Job *job,
-             CumulativeStatistics &cumStats);
-void run_jobs(operation_enum operation, CumulativeStatistics &cumStats);
+             CumulativeStatistics *cumStats);
+void run_jobs(operation_enum operation, CumulativeStatistics *cumStats);
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -925,7 +923,7 @@ void end_program(int exitCode, char *fmt, ...)
    if (gLogger)
    {
       if (exitCode == EXIT_OK)
-         end_statistics(gCumStats);
+         end_statistics(&gCumStats);
       if (gFoundTransferErrors > 0)
       {
          if (gLogfilePath.length() > 0)
@@ -1008,41 +1006,13 @@ void *threads_signal_handler(void *arg)
 #endif // USE_THREADS
 
 
-//////////////////////////  intermediate_statistics() /////////////////////////
-void intermediate_statistics(const Job *job, 
-                             const CumulativeStatistics &cumStats)
-{
-   capacity_t totalBytesRead = cumStats.getTotalBytesRead();
-   TimeHack totalReadTransferTime = cumStats.getTotalReadTransferTime();
-   capacity_t totalBytesWritten = cumStats.getTotalBytesWritten();
-   TimeHack totalWriteTransferTime = cumStats.getTotalWriteTransferTime();
-   TimeHack currentTime(TimeHack::getCurrentTime());
-   switch (job->getIoDirection())
-   {
-   case READING:
-      totalBytesRead += job->getJobBytesTransferred();
-      totalReadTransferTime += currentTime - job->getJobStartTime();
-      break;
-   case WRITING:
-      totalBytesWritten += job->getJobBytesTransferred();
-      totalWriteTransferTime += currentTime - job->getJobStartTime();
-      break;
-   }
-   gDisplay->intermediateStatistics(*job->getStatistics(),
-                                    cumStats, 
-                                    job->getTransferSize(),
-                                    TimeHack::getCurrentTime(),
-                                    currentTime - gProgramStartTime);
-}
-
-
 //////////////////////////  cumulative_statistics()  //////////////////////////
 void cumulative_statistics(const Job *job, 
-                           const CumulativeStatistics &cumStats)
+                           const CumulativeStatistics *cumStats)
 {
    TimeHack now(TimeHack::getCurrentTime());
    TimeHack jobTransferTime(job->getJobEndTime() - job->getJobStartTime());
-   gDisplay->cumulativeStatistics(*job->getStatistics(),
+   gDisplay->cumulativeStatistics(job->getStatistics(),
                                   cumStats,
                                   now - gProgramStartTime);
 
@@ -1053,7 +1023,7 @@ void cumulative_statistics(const Job *job,
    {
    case READING:
       gLogger->logNote("Iter: %5d   RTR: %11.2Lf %-5s   TT: %s   IOPS: %11.2Lf\n",
-                       cumStats.getIterations(),
+                       cumStats->getIterations(),
                        transferRate, 
                        getTransferRateUnitsStr(gUnits), 
                        jobTransferTime.getElapsedTimeStr().c_str(),
@@ -1061,7 +1031,7 @@ void cumulative_statistics(const Job *job,
       break;
    case WRITING:
       gLogger->logNote("Iter: %5d   WTR: %11.2Lf %-5s   TT: %s   IOPS: %11.2Lf\n",
-                       cumStats.getIterations(),
+                       cumStats->getIterations(),
                        transferRate, 
                        getTransferRateUnitsStr(gUnits), 
                        jobTransferTime.getElapsedTimeStr().c_str(),
@@ -1072,7 +1042,7 @@ void cumulative_statistics(const Job *job,
 
 
 //////////////////////////  end_statistics()  ////////////////////////////////
-void end_statistics(const CumulativeStatistics &cumStats)
+void end_statistics(const CumulativeStatistics *cumStats)
 {
    unsigned int device;
    device = Log::OUTPUT_LOG_STDOUT;
@@ -1084,28 +1054,28 @@ void end_statistics(const CumulativeStatistics &cumStats)
    if (!gUseTui)
       gLogger->note(device, "\n");
    gLogger->note(device, "Total iterations:                %17u\n",
-                 cumStats.getIterations());
+                 cumStats->getIterations());
    gLogger->note(device, "Total runtime:                   %17s\n",
                  gProgramStartTime.getTimeDiffStr(now).c_str());
 
-   if (cumStats.getTotalBytesWritten() > 0)
+   if (cumStats->getTotalBytesWritten() > 0)
    {
-      long double writeTransferRate = convertCapacity((long double)(cumStats.getTotalBytesWritten()), gUnits)/(long double)(cumStats.getTotalWriteTransferTime().getTime());
-      long double writeIops = (long double)cumStats.getTotalWriteOps()/(long double)(cumStats.getTotalWriteTransferTime().getTime());
+      long double writeTransferRate = convertCapacity((long double)(cumStats->getTotalBytesWritten()), gUnits)/(long double)(cumStats->getTotalWriteTransferTime().getTime());
+      long double writeIops = (long double)cumStats->getTotalWriteOps()/(long double)(cumStats->getTotalWriteTransferTime().getTime());
       gLogger->note(device, "Total write transfer time (WTT): %17s\n", 
-                    cumStats.getTotalWriteTransferTime().getElapsedTimeStr().c_str());
+                    cumStats->getTotalWriteTransferTime().getElapsedTimeStr().c_str());
       gLogger->note(device, "Total write transfer rate (WTR): %11.2Lf %-5s\n",
                     writeTransferRate, getTransferRateUnitsStr(gUnits));
       gLogger->note(device, "Total write IOPS:                %11.2Lf IOPS\n", writeIops);
                     
    }
-   if (cumStats.getTotalBytesRead() > 0)
+   if (cumStats->getTotalBytesRead() > 0)
       
    {
-      long double readTransferRate = convertCapacity((long double)cumStats.getTotalBytesRead(), gUnits)/(long double)(cumStats.getTotalReadTransferTime().getTime());
-      long double readIops = (long double)cumStats.getTotalReadOps()/(long double)(cumStats.getTotalReadTransferTime().getTime());
+      long double readTransferRate = convertCapacity((long double)cumStats->getTotalBytesRead(), gUnits)/(long double)(cumStats->getTotalReadTransferTime().getTime());
+      long double readIops = (long double)cumStats->getTotalReadOps()/(long double)(cumStats->getTotalReadTransferTime().getTime());
       gLogger->note(device, "Total read transfer time (RTT):  %17s\n", 
-                    cumStats.getTotalReadTransferTime().getElapsedTimeStr().c_str());
+                    cumStats->getTotalReadTransferTime().getElapsedTimeStr().c_str());
       gLogger->note(device, "Total read transfer rate (RTR):  %11.2Lf %-5s\n",
                     readTransferRate, getTransferRateUnitsStr(gUnits));
       gLogger->note(device, "Total read IOPS:                 %11.2Lf IOPS\n", readIops);
@@ -1117,7 +1087,7 @@ void end_statistics(const CumulativeStatistics &cumStats)
 int run_transfers(Job *job, 
                   capacity_t numTransfers, 
                   bool continueAfterError,
-                  CumulativeStatisticsReadWrite &cumStats)
+                  CumulativeStatisticsReadWrite *cumStats)
 {
    int ret;
 
@@ -1126,12 +1096,12 @@ int run_transfers(Job *job,
    switch (job->getIoDirection())
    {
    case READING:
-      cumStats.addToTotalBytesRead(job->getBytesTransferred());
-      cumStats.addToTotalReadTransferTime(job->getTransferEndTime() - job->getTransferStartTime()); 
+      cumStats->addToTotalBytesRead(job->getBytesTransferred());
+      cumStats->addToTotalReadTransferTime(job->getTransferEndTime() - job->getTransferStartTime()); 
       break;
    case WRITING:
-      cumStats.addToTotalBytesWritten(job->getBytesTransferred());
-      cumStats.addToTotalWriteTransferTime(job->getTransferEndTime() - job->getTransferStartTime()); 
+      cumStats->addToTotalBytesWritten(job->getBytesTransferred());
+      cumStats->addToTotalWriteTransferTime(job->getTransferEndTime() - job->getTransferStartTime()); 
       break;
    }
 
@@ -1140,184 +1110,62 @@ int run_transfers(Job *job,
 
 
 //////////////////////////  run_job()  ////////////////////////////////////////
-void run_job(Job *job, CumulativeStatisticsReadWrite &cumStats)
+void run_job(Job *job, CumulativeStatisticsReadWrite *cumStats)
 {
    int ret;
-   capacity_t startingVerticalHacks = gDisplay->getCurrentNumVerticalHacks();
-   capacity_t startingHorizontalHacks = gDisplay->getCurrentNumHorizontalHacks();
+   capacity_t startingVerticalHacks = gDisplay->getCurrentProgressRows();
+   capacity_t startingHorizontalHacks = gDisplay->getCurrentProgressColumns();
    capacity_t totalTransfers = job->getTotalNumberOfTransfers();
    capacity_t transferSize = job->getTransferSize();
-   TimeHack savedTotalWriteTransferTime(cumStats.getTotalWriteTransferTime());
-   TimeHack savedTotalReadTransferTime(cumStats.getTotalReadTransferTime());
+   TimeHack savedTotalWriteTransferTime(cumStats->getTotalWriteTransferTime());
+   TimeHack savedTotalReadTransferTime(cumStats->getTotalReadTransferTime());
+   gDisplay->setTotalTransfers(totalTransfers);
 
    if (gProgress || gUseTui)
    {
-      capacity_t transfersPerVerticalHack = (capacity_t)((double)totalTransfers/(double)startingVerticalHacks);
-      capacity_t verticalHacks = startingVerticalHacks;
-      if (transfersPerVerticalHack < 1LLU)
-      {
-         transfersPerVerticalHack = 1LLU;
-         verticalHacks = totalTransfers;
-      }
-
-      capacity_t transfersPerHorizontalHack = (capacity_t)((double)transfersPerVerticalHack/(double)startingHorizontalHacks);
-      capacity_t horizontalHacks = startingHorizontalHacks;
-      if (transfersPerHorizontalHack <= 1LLU)
-      {
-         transfersPerHorizontalHack = 1LLU;
-         if (transfersPerVerticalHack > startingHorizontalHacks)
-            horizontalHacks = startingHorizontalHacks;
-         else
-            horizontalHacks = transfersPerVerticalHack;
-      }
-         
       capacity_t bufferSize = job->getBufferSize();
-      capacity_t remainingTransfers;
-
-      gDisplay->startJob(cumStats.getIterations(), job->getIoDirection());
+      gDisplay->startJob(cumStats->getIterations(), job->getIoDirection());
       ret = job->startJob();
       if (ret != EXIT_OK)
       {
          end_program(ret, "%s\n", job->getLastErrorMessage().c_str());
       }
-      for (capacity_t i = 1LLU; i <= verticalHacks - 1; i++)
+      capacity_t numTrans;
+      while ((numTrans = gDisplay->getTransfersInNextHack()) > 0)
       {
-         // Run transfers for horizontal hacks.
-         job->startHackRow();
-         for (capacity_t j = 1LLU; j <= horizontalHacks - 1; j++)
-         {
-            ret = run_transfers(job, 
-                                transfersPerHorizontalHack, 
-                                gContinueAfterError,
-                                cumStats);
-            if (ret != EXIT_OK)
-            {
-               gFoundTransferErrors++;
-               gDisplay->errorHack();
-               if (gContinueAfterError)
-               {
-                  gLogger->logError("%s\n", 
-                                    job->getLastErrorMessage().c_str());
-               }
-               else
-               {
-                  end_program(ret, "%s\n", job->getLastErrorMessage().c_str());
-               }
-            }
-            else
-            {
-               gDisplay->hack();
-            }
-         }
-            
-         // Finish remaining transfers for last horizontal hack.
-         remainingTransfers = transfersPerVerticalHack - (transfersPerHorizontalHack * (horizontalHacks - 1));
+         if (gDisplay->isStartOfProgressRow())
+            job->startInterval();
          ret = run_transfers(job, 
-                             remainingTransfers, 
+                             numTrans, 
                              gContinueAfterError,
                              cumStats);
+         if (gDisplay->isEndOfProgressRow(numTrans))
+            job->endInterval();
          if (ret != EXIT_OK)
          {
             gFoundTransferErrors++;
-            gDisplay->errorEndHack();
             if (gContinueAfterError)
             {
-               gLogger->logError("%s\n", job->getLastErrorMessage().c_str());
+               gLogger->logError("%s\n", 
+                                 job->getLastErrorMessage().c_str());
+               gDisplay->addToProgress(numTrans, 
+                                       true, 
+                                       job->getStatistics(),
+                                       cumStats);
             }
             else
             {
-               gDisplay->nextHackRow();
                end_program(ret, "%s\n", job->getLastErrorMessage().c_str());
             }
          }
          else
          {
-            gDisplay->endHack();
+            gDisplay->addToProgress(numTrans, 
+                                    false,
+                                    job->getStatistics(),
+                                    cumStats);
          }
-         job->endHackRow();
-         for (capacity_t j = 0;
-              j < startingHorizontalHacks - horizontalHacks;
-              j++)
-         {
-            gDisplay->noHack();
-         }
-         intermediate_statistics(job, cumStats);
-         gDisplay->nextHackRow();
-      }
-
-      // Finish transfers for last vertical hack leftovers.
-      remainingTransfers = (transferSize - job->getJobBytesTransferred())/bufferSize;
-      if (remainingTransfers > 0LLU)
-      {
-         job->startHackRow();
-         transfersPerHorizontalHack = (capacity_t)((double)remainingTransfers/(double)startingHorizontalHacks);
-         if (transfersPerHorizontalHack <= 1)
-         {
-            transfersPerHorizontalHack = 1LLU;
-            if (remainingTransfers > startingHorizontalHacks)
-               horizontalHacks = startingHorizontalHacks;
-            else
-               horizontalHacks = remainingTransfers;
-         }
-         for (capacity_t j = 1LLU; j <= horizontalHacks - 1; j++)
-         {
-            ret = run_transfers(job, 
-                                transfersPerHorizontalHack,
-                                gContinueAfterError,
-                                cumStats);
-            if (ret != EXIT_OK)
-            {
-               gFoundTransferErrors++;
-               gDisplay->errorHack();
-               if (gContinueAfterError)
-               {
-                  gLogger->logError("%s\n", 
-                                    job->getLastErrorMessage().c_str());
-               }
-               else
-               {
-                  gDisplay->nextHackRow();
-                  end_program(ret, "%s\n", job->getLastErrorMessage().c_str());
-               }
-            }
-            else
-            {
-               gDisplay->hack();
-            }
-         }
-         ret = run_transfers(job, 
-                             remainingTransfers - (transfersPerHorizontalHack * (horizontalHacks - 1)), 
-                             gContinueAfterError,
-                             cumStats);
-                             
-         if (ret != EXIT_OK)
-         {
-            gFoundTransferErrors++;
-            gDisplay->errorEndHack();
-            if (gContinueAfterError)
-            {
-               gLogger->logError("%s\n", job->getLastErrorMessage().c_str());
-            }
-            else
-            {
-               gDisplay->nextHackRow();
-               end_program(ret, "%s\n", job->getLastErrorMessage().c_str());
-            }
-         }
-         else
-         {
-            gDisplay->endHack();
-         }
-         job->endHackRow();
-         for (capacity_t j = 0; 
-              j < startingHorizontalHacks - horizontalHacks;
-              j++)
-         {
-            gDisplay->noHack();
-         }
-         intermediate_statistics(job, cumStats);
-         gDisplay->nextHackRow();
-      }
+      }            
       ret = job->finishJob();
       if (ret != EXIT_OK)
       {
@@ -1325,9 +1173,9 @@ void run_job(Job *job, CumulativeStatisticsReadWrite &cumStats)
          exit(ret);
       }
    }
-   else
+   else  // no progress or TUI.
    {
-      gDisplay->startJob(cumStats.getIterations(), job->getIoDirection());
+      gDisplay->startJob(cumStats->getIterations(), job->getIoDirection());
       ret = job->startJob();
       if (ret != EXIT_OK)
       {
@@ -1361,10 +1209,10 @@ void run_job(Job *job, CumulativeStatisticsReadWrite &cumStats)
    switch (job->getIoDirection())
    {
    case READING:
-      cumStats.setTotalReadTransferTime(savedTotalReadTransferTime + job->getJobEndTime() - job->getJobStartTime());
+      cumStats->setTotalReadTransferTime(savedTotalReadTransferTime + job->getJobEndTime() - job->getJobStartTime());
       break;
    case WRITING:
-      cumStats.setTotalWriteTransferTime(savedTotalWriteTransferTime + job->getJobEndTime() - job->getJobStartTime());
+      cumStats->setTotalWriteTransferTime(savedTotalWriteTransferTime + job->getJobEndTime() - job->getJobStartTime());
       break;
    }
 
@@ -1372,10 +1220,10 @@ void run_job(Job *job, CumulativeStatisticsReadWrite &cumStats)
    switch (job->getIoDirection())
    {
    case READING:
-      cumStats.addToTotalReadOps(job->getTotalNumberOfTransfers()); 
+      cumStats->addToTotalReadOps(job->getTotalNumberOfTransfers()); 
       break;
    case WRITING:
-      cumStats.addToTotalWriteOps(job->getTotalNumberOfTransfers()); 
+      cumStats->addToTotalWriteOps(job->getTotalNumberOfTransfers()); 
       break;
    }
 
@@ -1385,203 +1233,203 @@ void run_job(Job *job, CumulativeStatisticsReadWrite &cumStats)
 
 
 //////////////////////////  run_jobs()  ///////////////////////////////////////
-void run_jobs(operation_enum operation, 
-              CumulativeStatisticsReadWrite &cumStats)
-{
-   int ret;
-
-   cumStats.setIterations(0);
-   do
+   void run_jobs(operation_enum operation, 
+                 CumulativeStatisticsReadWrite *cumStats)
    {
-      cumStats.incIterations();
-      if (operation == OPERATION_WRITE || 
-          operation == OPERATION_READ_AFTER_WRITE)
+      int ret;
+
+      cumStats->setIterations(0);
+      do
       {
-         Job *job = new WriteJob(*gLogger,
-                                 gFile,
-                                 gOffset,
-                                 gTransferSize,
-                                 gMinBufferSize,
-                                 gMaxBufferSize,
-                                 TransferInfoList::GEOMETRIC_PROGRESSION,
-                                 gPattern,
-                                 gFillMethod,
-                                 gIOMethod,
-                                 gSeed,
-                                 gJobId);
-         if (job == (Job *)NULL)
-         {
-            gLogger->showError("Could not allocate memory.");
-            exit(EXIT_ERROR_MEMORY_ALLOC);
-         }
-         if ((ret = job->init()) != EXIT_OK)
-         {
-            gLogger->showError("Could not initialize job.\n");
-            exit(ret);
-         }
-         
-         run_job(job, cumStats);
-         delete job;
-         
-         if (gIterationsToDo == 0 || 
-             cumStats.getIterations() < gIterationsToDo ||
-             cumStats.getIterations() == gIterationsToDo && 
+         cumStats->incIterations();
+         if (operation == OPERATION_WRITE || 
              operation == OPERATION_READ_AFTER_WRITE)
          {
-            gDisplay->nextJob();
+            Job *job = new WriteJob(*gLogger,
+                                    gFile,
+                                    gOffset,
+                                    gTransferSize,
+                                    gMinBufferSize,
+                                    gMaxBufferSize,
+                                    TransferInfoList::GEOMETRIC_PROGRESSION,
+                                    gPattern,
+                                    gFillMethod,
+                                    gIOMethod,
+                                    gSeed,
+                                    gJobId);
+            if (job == (Job *)NULL)
+            {
+               gLogger->showError("Could not allocate memory.");
+               exit(EXIT_ERROR_MEMORY_ALLOC);
+            }
+            if ((ret = job->init()) != EXIT_OK)
+            {
+               gLogger->showError("Could not initialize job.\n");
+               exit(ret);
+            }
+         
+            run_job(job, cumStats);
+            delete job;
+         
+            if (gIterationsToDo == 0 || 
+                cumStats->getIterations() < gIterationsToDo ||
+                cumStats->getIterations() == gIterationsToDo && 
+                operation == OPERATION_READ_AFTER_WRITE)
+            {
+               gDisplay->nextJob();
+            }
          }
-      }
 
-      if (operation == OPERATION_READ || 
-          operation == OPERATION_READ_AFTER_WRITE)
-      {
-         Job *job = new ReadJob(*gLogger,
-                                gFile,
-                                gOffset,
-                                gTransferSize,
-                                gMinBufferSize,
-                                gMaxBufferSize,
-                                TransferInfoList::GEOMETRIC_PROGRESSION,
-                                gPattern,
-                                gFillMethod,
-                                gIOMethod,
-                                gSeed,
-                                gJobId);
-         if (job == (Job *)NULL)
+         if (operation == OPERATION_READ || 
+             operation == OPERATION_READ_AFTER_WRITE)
          {
-            gLogger->showError("Could not allocate memory.");
-            exit(EXIT_ERROR_MEMORY_ALLOC);
-         }
-         if ((ret = job->init()) != EXIT_OK)
-         {
-            gLogger->showError("Could not initialize job.\n");
-            exit(ret);
+            Job *job = new ReadJob(*gLogger,
+                                   gFile,
+                                   gOffset,
+                                   gTransferSize,
+                                   gMinBufferSize,
+                                   gMaxBufferSize,
+                                   TransferInfoList::GEOMETRIC_PROGRESSION,
+                                   gPattern,
+                                   gFillMethod,
+                                   gIOMethod,
+                                   gSeed,
+                                   gJobId);
+            if (job == (Job *)NULL)
+            {
+               gLogger->showError("Could not allocate memory.");
+               exit(EXIT_ERROR_MEMORY_ALLOC);
+            }
+            if ((ret = job->init()) != EXIT_OK)
+            {
+               gLogger->showError("Could not initialize job.\n");
+               exit(ret);
+            }
+
+            run_job(job, cumStats);
+            delete job;
+
+            if (gIterationsToDo == 0 || cumStats->getIterations() < gIterationsToDo)
+            {
+               gDisplay->nextJob();
+            }
          }
 
-         run_job(job, cumStats);
-         delete job;
-
-         if (gIterationsToDo == 0 || cumStats.getIterations() < gIterationsToDo)
-         {
-            gDisplay->nextJob();
-         }
-      }
-
-   } while (gIterationsToDo == 0LLU || cumStats.getIterations() < gIterationsToDo);
-}
+      } while (gIterationsToDo == 0LLU || cumStats->getIterations() < gIterationsToDo);
+   }
 
 
 //////////////////////////  main()  ///////////////////////////////////////////
-int main(int argc, char *argv[])
-{
-   int rtn;
+   int main(int argc, char *argv[])
+   {
+      int rtn;
 
-   // Process command-line options.
-   gPrgName = argv[0];
-   const char *prgBasename = basename(gPrgName);
-   string cmdArgs;
+      // Process command-line options.
+      gPrgName = argv[0];
+      const char *prgBasename = basename(gPrgName);
+      string cmdArgs;
    
-   for (int i = 1; PROG_NAME_LOOKUP[i] != (char *)NULL; i++)
-   {
-      if (strcmp(prgBasename, PROG_NAME_LOOKUP[i]) == 0)
+      for (int i = 1; PROG_NAME_LOOKUP[i] != (char *)NULL; i++)
       {
-         gOperation = (operation_enum)i;
-         break;
+         if (strcmp(prgBasename, PROG_NAME_LOOKUP[i]) == 0)
+         {
+            gOperation = (operation_enum)i;
+            break;
 
+         }
       }
-   }
 
-   if (!parse_options(argc, (const char **)argv, cmdArgs))
-   {
-      exit(EXIT_ERROR_USAGE);
-   }
-   if (!validate_options())
-      exit(EXIT_ERROR_USAGE);
+      if (!parse_options(argc, (const char **)argv, cmdArgs))
+      {
+         exit(EXIT_ERROR_USAGE);
+      }
+      if (!validate_options())
+         exit(EXIT_ERROR_USAGE);
 
-   if (gGetVersion)
-   {
-      version();
-      exit(0);
-   }
+      if (gGetVersion)
+      {
+         version();
+         exit(0);
+      }
 
-   struct sigaction action;
+      struct sigaction action;
 #ifdef USE_THREADS
-   sigset_t sigsToBlock;
-   sigemptyset(&sigsToBlock);
-   sigaddset(&sigsToBlock, SIGQUIT);
-   sigaddset(&sigsToBlock, SIGTERM);
-   sigaddset(&sigsToBlock, SIGINT);
-   pthread_sigmask(SIG_BLOCK, &sigsToBlock, NULL);
+      sigset_t sigsToBlock;
+      sigemptyset(&sigsToBlock);
+      sigaddset(&sigsToBlock, SIGQUIT);
+      sigaddset(&sigsToBlock, SIGTERM);
+      sigaddset(&sigsToBlock, SIGINT);
+      pthread_sigmask(SIG_BLOCK, &sigsToBlock, NULL);
 
-   action.sa_handler = resize;
-   sigemptyset(&action.sa_mask);
-   action.sa_flags = SA_RESTART;
-   sigaction(SIGWINCH, &action, NULL);
+      action.sa_handler = resize;
+      sigemptyset(&action.sa_mask);
+      action.sa_flags = SA_RESTART;
+      sigaction(SIGWINCH, &action, NULL);
 
-   pthread_t signal_handler_thread;
-   if (pthread_create(&signal_handler_thread, 
-                      NULL,
-                      &threads_signal_handler,
-                      NULL))
-   {
-      error_msg("Could not create thread.\n");
-      exit(EXIT_ERROR_SYSTEM);
-   }
+      pthread_t signal_handler_thread;
+      if (pthread_create(&signal_handler_thread, 
+                         NULL,
+                         &threads_signal_handler,
+                         NULL))
+      {
+         error_msg("Could not create thread.\n");
+         exit(EXIT_ERROR_SYSTEM);
+      }
 #else
-   action.sa_handler = cleanup;
-   sigemptyset(&action.sa_mask);
-   action.sa_flags = 0;
-   sigaction(SIGQUIT, &action, NULL);
-   sigaction(SIGTERM, &action, NULL);
-   sigaction(SIGINT, &action, NULL);
+      action.sa_handler = cleanup;
+      sigemptyset(&action.sa_mask);
+      action.sa_flags = 0;
+      sigaction(SIGQUIT, &action, NULL);
+      sigaction(SIGTERM, &action, NULL);
+      sigaction(SIGINT, &action, NULL);
 
-   action.sa_handler = resize;
-   sigemptyset(&action.sa_mask);
-   action.sa_flags = SA_RESTART;
-   sigaction(SIGWINCH, &action, NULL);
+      action.sa_handler = resize;
+      sigemptyset(&action.sa_mask);
+      action.sa_flags = SA_RESTART;
+      sigaction(SIGWINCH, &action, NULL);
 #endif // USE_THREADS
 
-   gLogger = new Log(gLogfilePath);
-   if (gLogger == (Log *)NULL)
-   {
-      end_program(EXIT_ERROR_MEMORY_ALLOC, "Out of memory.\n");
+      gLogger = new Log(gLogfilePath);
+      if (gLogger == (Log *)NULL)
+      {
+         end_program(EXIT_ERROR_MEMORY_ALLOC, "Out of memory.\n");
+      }
+      if ((rtn = gLogger->open()) != EXIT_OK)
+      {
+         end_program(rtn, "Could not open logfile \"%s\" -- %s\n",
+                     gLogfilePath.c_str(), strError(rtn).c_str());
+      }
+
+      if (gUseTui)
+         gDisplay = new SpewTui(gIterationsToDo, gUnits, gProgress, gVerbosity);
+      else
+         gDisplay = new SpewConsole(gIterationsToDo, gUnits, gProgress, gVerbosity);
+
+      if (gDisplay == (SpewDisplay *)NULL)
+         end_program(EXIT_ERROR_MEMORY_ALLOC, "Out of memory.\n");
+      if ((rtn = gDisplay->init()) != EXIT_OK)
+         end_program(rtn, "Could not initialize display.\n");
+
+      gDisplay->setCurrentUnits(gUnits);
+      gProgramStartTime = TimeHack::getCurrentTime();
+      gLogger->logStart();
+      gLogger->logCmdLine(cmdArgs.c_str());
+      gLogger->logNote("\n");
+      gDisplay->startRun(gProgramStartTime);
+
+      try 
+      {
+         run_jobs(gOperation, &gCumStats);
+      } catch(...)
+      {
+         gLogger->showError("Caught exception\n");
+         exit(EXIT_ERROR_CAUGHT_EXCEPTION);
+      }
+      gDisplay->endRun();
+      end_program(EXIT_OK);
+
+      return 0;
    }
-   if ((rtn = gLogger->open()) != EXIT_OK)
-   {
-      end_program(rtn, "Could not open logfile \"%s\" -- %s\n",
-                  gLogfilePath.c_str(), strError(rtn).c_str());
-   }
-
-   if (gUseTui)
-      gDisplay = new SpewTui(gIterationsToDo, gUnits, gProgress, gVerbosity);
-   else
-      gDisplay = new SpewConsole(gIterationsToDo, gUnits, gProgress, gVerbosity);
-
-   if (gDisplay == (SpewDisplay *)NULL)
-      end_program(EXIT_ERROR_MEMORY_ALLOC, "Out of memory.\n");
-   if ((rtn = gDisplay->init()) != EXIT_OK)
-      end_program(rtn, "Could not initialize display.\n");
-
-   gDisplay->setCurrentUnits(gUnits);
-   gProgramStartTime = TimeHack::getCurrentTime();
-   gLogger->logStart();
-   gLogger->logCmdLine(cmdArgs.c_str());
-   gLogger->logNote("\n");
-   gDisplay->startRun();
-
-   try 
-   {
-      run_jobs(gOperation, gCumStats);
-   } catch(...)
-   {
-      gLogger->showError("Caught exception\n");
-      exit(EXIT_ERROR_CAUGHT_EXCEPTION);
-   }
-   gDisplay->endRun();
-   end_program(EXIT_OK);
-
-   return 0;
-}
 
 
 

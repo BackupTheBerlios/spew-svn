@@ -38,8 +38,8 @@ public:
    virtual int close(); 
    virtual int resize();
 
-   virtual unsigned int getCurrentNumVerticalHacks() const;
-   virtual unsigned int getCurrentNumHorizontalHacks() const;
+   virtual unsigned int getCurrentProgressRows() const;
+   virtual unsigned int getCurrentProgressColumns() const;
 
    virtual void hack();
    virtual void endHack();
@@ -47,17 +47,15 @@ public:
    virtual void errorEndHack();
    virtual void noHack();
    virtual void noEndHack();
-   virtual void nextHackRow();
+   virtual void nextProgressRow();
 
-   virtual void intermediateStatistics(const JobStatistics &jobStats,
-                                       const CumulativeStatistics &cumStats,
-                                       capacity_t bytesInJob,
+   virtual void intermediateStatistics(const JobStatistics *jobStats,
+                                       const CumulativeStatistics *cumStats,
                                        const TimeHack& currentTime,
-                                       const TimeHack& totalRunTime);
-   virtual void cumulativeStatistics(const JobStatistics &jobStats,
-                                     const CumulativeStatistics &cumStats,
+                                       const TimeHack& startTime);
+   virtual void cumulativeStatistics(const JobStatistics *jobStats,
+                                     const CumulativeStatistics *cumStats,
                                      const TimeHack& totalRunTime);
-   virtual void startRun() {};
    virtual void endRun() {};
    virtual void startJob(unsigned int iteration, IoDirection_t direction);
    virtual void endJob() {};

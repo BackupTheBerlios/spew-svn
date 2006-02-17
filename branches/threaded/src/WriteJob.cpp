@@ -104,7 +104,8 @@ int WriteJob::startJob()
                                                mBuffer, 
                                                mMaxBufferSize, 
                                                mJobId, 
-                                               mSeed);
+                                               mSeed,
+															  this->getIoDirection());
    if (mTransfer == (Transfer *)NULL)
    {
       mLastErrorMsg = strPrintf("Could not allocate memory for transfer.\n"); 
@@ -130,38 +131,7 @@ int WriteJob::finishJob()
 }
 
 
-///////////////////////////  WriteJob::runTransfers()  ////////////////////////
-int WriteJob::runTransfers(capacity_t numTransfers, bool continueAfterError)
+///////////////////////////  WriteJob::~WriteJob()  ///////////////////////////
+WriteJob::~WriteJob()
 {
-   // continueAfterError (data integrity errors) is meaningless for
-   // writes, so it is ignored.
-
-   this->setTransferStartTime();
-   mStats->setTransferBytesTransferred(0);
-   int exitCode = EXIT_OK;
-   for (capacity_t i = 0; i < numTransfers; i++)
-   {
-      const TransferInfo *nextTransfer = mTransferInfoList->next();
-      if (!nextTransfer)
-      {
-         mLastErrorMsg += "Fatal internal error - no transfers left to process.";
-         return EXIT_ERROR_ILLEGAL_OPERATION;
-      }
-      int ret = mTransfer->write(*nextTransfer, mLastErrorMsg);
-      capacity_t transferSize = nextTransfer->getSize();
-      if (ret == EXIT_OK)
-      {
-         mStats->addToJobBytesTransferred(transferSize);
-         mStats->addToTransferBytesTransferred(transferSize);
-         if (mRunningHackRow)
-            mStats->addToHackRowBytesTransferred(transferSize);
-      }
-      else
-      {
-         exitCode = ret;
-         break;
-      }
-   }
-   this->setTransferEndTime();
-   return exitCode;
 }

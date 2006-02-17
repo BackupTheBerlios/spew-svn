@@ -35,6 +35,7 @@ LDADD = libcommon.a libtui.a
 
 bin_PROGRAMS = spew
 spew_SOURCES = spew.cpp \
+	       SpewProgressRow.cpp SpewProgressRow.h \
                SpewDisplay.cpp SpewDisplay.h \
                SpewConsole.cpp SpewConsole.h \
                SpewTui.cpp SpewTui.h \

@@ -23,9 +23,12 @@
 #ifndef SPEWDISPLAY_H
 #define SPEWDISPLAY_H
 
+#include <vector>
+
 #include "TimeHack.h"
-#include "JobStatistics.h"
-#include "CumulativeStatistics.h"
+#include "JobStatisticsReadOnly.h"
+#include "CumulativeStatisticsReadOnly.h"
+#include "SpewProgressRow.h"
 
 
 class SpewDisplay
@@ -49,8 +52,19 @@ public:
    virtual IoDirection_t getCurrentIoDirection() const { return mCurrentIoDirection; };
    virtual Units_t getCurrentUnits() const { return mCurrentUnits; };
 
-   virtual unsigned int getCurrentNumVerticalHacks() const = 0;
-   virtual unsigned int getCurrentNumHorizontalHacks() const = 0;
+   virtual unsigned int getCurrentProgressRows() const = 0;
+   virtual unsigned int getCurrentProgressColumns() const = 0;
+   bool isStartOfProgressRow() const;
+   bool isEndOfProgressRow(capacity_t numTrans) const;
+   
+   capacity_t setTotalTransfers(capacity_t numTrans) { mTotalTransfers = numTrans; };
+   void addToTransfersCompleted(capacity_t numTrans);
+   capacity_t getTransfersInNextHack();
+
+   void addToProgress(capacity_t numTrans, 
+                      bool foundError,
+                      const JobStatistics *jobStats,
+                      const CumulativeStatistics *cumStats);
 
    virtual void hack() = 0;
    virtual void endHack() = 0;
@@ -58,18 +72,17 @@ public:
    virtual void errorEndHack() = 0;
    virtual void noHack() = 0;
    virtual void noEndHack() = 0;
-   virtual void nextHackRow() = 0;
+   virtual void nextProgressRow() = 0;
 
-   virtual void intermediateStatistics(const JobStatistics &jobStats,
-                                       const CumulativeStatistics &cumStats,
-                                       capacity_t bytesInJob,
+   virtual void intermediateStatistics(const JobStatistics *jobStats,
+                                       const CumulativeStatistics *cumStats,
                                        const TimeHack& currentTime,
-                                       const TimeHack& totalRunTime) = 0;
-   virtual void cumulativeStatistics(const JobStatistics &jobStats,
-                                     const CumulativeStatistics &cumStats,
+                                       const TimeHack& startTime) = 0;
+   virtual void cumulativeStatistics(const JobStatistics *jobStats,
+                                     const CumulativeStatistics *cumStats,
                                      const TimeHack& totalRunTime) = 0;
 
-   virtual void startRun() = 0;
+   virtual void startRun(const TimeHack &startTime);
    virtual void endRun() = 0;
    virtual void startJob(unsigned int iteration, IoDirection_t direction);
    virtual void endJob() = 0;
@@ -80,15 +93,21 @@ public:
 private:
    SpewDisplay(); // Hide default constructor.
    SpewDisplay(const SpewDisplay&); // Hide copy constructor.
+   SpewDisplay& operator=(const SpewDisplay& rhs); //Hide assignment operator.
+
 
 protected:
    unsigned int mIterationsToDo;
    Units_t mCurrentUnits;
    bool mShowProgress;
    Verbosity_t mVerbosity;
+   TimeHack mStartTime;
    unsigned int mCurrentIteration;
    IoDirection_t mCurrentIoDirection;
-
+   capacity_t mTotalTransfers;
+   capacity_t mTransfersCompleted;
+   unsigned int mCurrentProgressRow;
+   vector<SpewProgressRow> mProgressRows;
 };
 
 #endif // SPEWDISPLAY_H
