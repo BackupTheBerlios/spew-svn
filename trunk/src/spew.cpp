@@ -209,7 +209,7 @@ void help(poptContext &context)
 "\n"
 "  FILE                              Regular or device file to write data to.\n"
 "  LOGFILE                           Path to a file used for logging.\n"
-"  MAX_BUFFER_SIZE                   Mimimum buffer size used in each \n"
+"  MAX_BUFFER_SIZE                   Minimum buffer size used in each \n"
 "                                    read(2)/write(2) call (default is\n"
 "                                    MIN_BUFFER_SIZE bytes).\n"
 "                                    MAX_BUFFER_SIZE. Must be an even\n"
@@ -225,7 +225,7 @@ void help(poptContext &context)
 "                                    between the two limits are used.\n"
 "                                    MAX_BUFFER_SIZE must be an even\n"
 "                                    multiple of MIN_BUFFER_SIZE.\n"
-"  MIN_BUFFER_SIZE                   Mimimum buffer size used in each \n"
+"  MIN_BUFFER_SIZE                   Minimum buffer size used in each \n"
 "                                    read(2)/write(2) call (default is\n"
 "                                    %llu bytes).\n"
 "                                    MIN_BUFFER_SIZE. Must be an even\n"
@@ -256,8 +256,9 @@ void help(poptContext &context)
 "  TRANSFER_SIZE                     Total number of bytes to transfer (must\n"
 "                                    be an even multiple of both\n"
 "                                    MIN_BUFFER_SIZE and MAX_BUFFER)SIZE).\n"
-"                                    TRANSER_SIZE can be specified in bytes,\n"
-"                                    kilobytes, megabytes, or gigabytes.\n"
+"                                    TRANSFER_SIZE can be specified in\n" 
+"                                    bytes, kilobytes, megabytes, or \n"
+"                                    gigabytes.\n"
 "  UNITS                             Kibibytes(k), kilobytes(K), \n"
 "                                    mebibytes(m), megabytes(M),\n" 
 "                                    gibibytes(g), gigabytes(G).\n"
@@ -567,12 +568,12 @@ bool parse_options(int argc, const char **argv, string& cmdArgs)
       {"generate-load", 'g', POPT_ARG_NONE, &generateLoadArg, 0, "Equivalent to: -v -t -P -p random -i 0.",  NULL},
       {"iterations", 'i', POPT_ARG_INT, &iterationsArg, 0, "Write/read data COUNT times. If count is 0, repeats forever.", "COUNT"},
       {"logfile", 'l', POPT_ARG_STRING, &logfilePathArgStr, 0, "Send log messages to LOGFILE.", "LOGFILE"},
-      {"no-progress", 0, POPT_ARG_NONE, &noProgressArg, 0, "Don't show progess (default).", NULL},
+      {"no-progress", 0, POPT_ARG_NONE, &noProgressArg, 0, "Don't show progress (default).", NULL},
       {"no-rcfiles", 0, POPT_ARG_NONE, NULL, 0, "Don't use standard rcfiles.", NULL},
       {"no-statistics", 'q', POPT_ARG_NONE, &noStatisticsArg, 0, "Don't output statistics.", NULL},
       {"no-tui", 0, POPT_ARG_NONE, &noTuiArg, 0, "Don't use TUI interface.", NULL},
       {"offset", 'o', POPT_ARG_STRING, &offsetArgStr, 0, "Seek to OFFSET before starting I/O.", "OFFSET"},
-      {"progress", 'P', POPT_ARG_NONE, &progressArg, 0, "Show progess.", NULL},
+      {"progress", 'P', POPT_ARG_NONE, &progressArg, 0, "Show progress.", NULL},
       {"pattern", 'p', POPT_ARG_STRING, &patternArgStr, 0, "Use data pattern PATTERN when reading or writing data.", "PATTERN"},
       {"random", 'r', POPT_ARG_NONE, &randomArg, 0, "Read/Write buffers to random offsets.", NULL},
       {"raw", 0, POPT_ARG_NONE, &readAfterWriteArg, 0, "An alias for --read-after-write.", NULL},
@@ -583,7 +584,7 @@ bool parse_options(int argc, const char **argv, string& cmdArgs)
       {"sync", 's', POPT_ARG_NONE, &syncArg, 0, "Use synchronous I/O.", NULL},
       {"statistics", 0, POPT_ARG_NONE, &statisticsArg, 0, "Output statistics (default).", NULL},
       {"tui", 't', POPT_ARG_NONE, &tuiArg, 0, "Use curses-based, terminal user interface.", NULL},
-      {"units", 'u', POPT_ARG_STRING, &unitsArgStr, 0, "Show tranfer rate in UNITS units.", "UNITS"},
+      {"units", 'u', POPT_ARG_STRING, &unitsArgStr, 0, "Show transfer rate in UNITS units.", "UNITS"},
       {"usage", 0, POPT_ARG_NONE, &usageArg, 0, "Show brief usage message and exit.", NULL},
       {"version", 'V', POPT_ARG_NONE, &gGetVersion, 0, "Output version information and exit.", NULL},
       {"detailed-statistics", 'v', POPT_ARG_NONE, &detailedStatisticsArg, 0, "Output detailed statistics.", NULL},
