@@ -100,8 +100,8 @@ int RandomTransfer::read(const TransferInfo &transInfo, string &errorMsg)
          {
             endingErrorRange = fileOffset + (i * sizeof(struct datum)) - 1;
             errors += strPrintf("\t%lld - %lld\n",
-               startingErrorRange + (bufferSize * transferNumber), 
-               endingErrorRange  + (bufferSize * transferNumber));
+               startingErrorRange, 
+               endingErrorRange);
             inErrorRange = false;
          }
       }
@@ -122,8 +122,8 @@ int RandomTransfer::read(const TransferInfo &transInfo, string &errorMsg)
    {
       endingErrorRange = fileOffset + bufferSize - 1;
       errors += strPrintf("\t%lld - %lld\n", 
-                          startingErrorRange + (bufferSize * transferNumber),
-                          endingErrorRange + (bufferSize * transferNumber));
+                          startingErrorRange, 
+                          endingErrorRange);
 
    }
    if (errorsFound > 0)

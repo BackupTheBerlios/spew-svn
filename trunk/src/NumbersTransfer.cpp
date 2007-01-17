@@ -95,9 +95,8 @@ int NumbersTransfer::read(const TransferInfo &transInfo, string &errorMsg)
          if (inErrorRange)
          {
             endingErrorRange = fileOffset + (i * datum_size) - 1;
-            errors += strPrintf("\t%lld - %lld\n",
-               startingErrorRange + (bufferSize * transferNumber), 
-               endingErrorRange  + (bufferSize * transferNumber));
+            errors += strPrintf("\t%lld - %lld\n", 
+                                startingErrorRange, endingErrorRange);
             inErrorRange = false;
          }
       }
@@ -118,8 +117,8 @@ int NumbersTransfer::read(const TransferInfo &transInfo, string &errorMsg)
    {
       endingErrorRange = fileOffset + bufferSize - 1;
       errors += strPrintf("\t%lld - %lld\n", 
-                          startingErrorRange + (bufferSize * transferNumber),
-                          endingErrorRange + (bufferSize * transferNumber));
+                          startingErrorRange,
+                          endingErrorRange);
 
    }
    if (errorsFound > 0)
