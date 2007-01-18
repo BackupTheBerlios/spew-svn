@@ -542,6 +542,7 @@ bool parse_options(int argc, const char **argv, string& cmdArgs)
    int writeArg = 0;
    int readArg = 0;
    int readAfterWriteArg = 0;
+   int seedArg = 0;
    int helpArg = 0;
    int usageArg = 0;
    int iterationsArg = -1;
@@ -580,7 +581,7 @@ bool parse_options(int argc, const char **argv, string& cmdArgs)
       {"rcfile", 0, POPT_ARG_STRING, &dummyArgStr, 0, "Read command-line options from RCFILE.", "RCFILE"},
       {"read", 0, POPT_ARG_NONE, &readArg, 0, "Read date from FILE.", NULL},
       {"read-after-write", 0, POPT_ARG_NONE, &readAfterWriteArg, 0, "Read back data after writing to FILE.", NULL},
-      {"seed", 'S', POPT_ARG_LONG, &gSeed, 0, "Use SEED for random number seed.","SEED"},
+      {"seed", 'S', POPT_ARG_INT, &seedArg, 0, "Use SEED for random number seed.","SEED"},
       {"sync", 's', POPT_ARG_NONE, &syncArg, 0, "Use synchronous I/O.", NULL},
       {"statistics", 0, POPT_ARG_NONE, &statisticsArg, 0, "Output statistics (default).", NULL},
       {"tui", 't', POPT_ARG_NONE, &tuiArg, 0, "Use curses-based, terminal user interface.", NULL},
@@ -750,6 +751,10 @@ bool parse_options(int argc, const char **argv, string& cmdArgs)
    // Iterations.
    if (iterationsArg >= 0)
       gIterationsToDo = (unsigned int)iterationsArg;
+
+   // Seed.
+   if (seedArg >= 0)
+      gSeed = (u32_t)seedArg;
 
    // TUI.
    if (noTuiArg)
