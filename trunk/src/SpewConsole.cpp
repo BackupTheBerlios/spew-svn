@@ -230,7 +230,7 @@ void SpewConsole::cumulativeStatistics(capacity_t jobBytesTransferred,
    switch (mCurrentIoDirection)
    {
    case READING:
-      printf("RTR: %11.2Lf %-5s   Tranfser time: %s    IOPS: %11.2Lf\n",
+      printf("RTR: %11.2Lf %-5s   Transfer time: %s    IOPS: %11.2Lf\n",
              transferRate, 
              getTransferRateUnitsStr(mCurrentUnits), 
              jobTransferTime.getElapsedTimeStr().c_str(),
