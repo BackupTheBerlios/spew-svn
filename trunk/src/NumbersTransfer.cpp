@@ -34,12 +34,11 @@ using namespace std;
 #include "NumbersTransfer.h"
 
 //////////////////////////  NumbersTransfer::NumbersTransfer()  ///////////////
-NumbersTransfer::NumbersTransfer(Log &logger,
-                                 int fd, 
+NumbersTransfer::NumbersTransfer(int fd, 
                                  unsigned char *buffer, 
                                  capacity_t bufferSize,
                                  capacity_t id) : 
-   Transfer(logger, fd, buffer, bufferSize, id)
+   Transfer(fd, buffer, bufferSize, id)
 {
 }
 

@@ -98,8 +98,7 @@ int WriteJob::startJob()
       return EXIT_ERROR_SYSTEM;
    }
 
-   mTransfer = TransferFactory::createInstance(mLogger,
-                                               mPattern,
+   mTransfer = TransferFactory::createInstance(mPattern,
                                                mFd,
                                                mBuffer, 
                                                mMaxBufferSize, 
@@ -138,6 +137,7 @@ int WriteJob::runTransfers(capacity_t numTransfers, bool continueAfterError)
 
    this->setTransferStartTime();
    mBytesTransferred = 0;
+	mLastErrorMsg = "";
    int exitCode = EXIT_OK;
    for (capacity_t i = 0; i < numTransfers; i++)
    {

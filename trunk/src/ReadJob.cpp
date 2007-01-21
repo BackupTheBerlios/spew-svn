@@ -98,8 +98,7 @@ int ReadJob::startJob()
       return EXIT_ERROR_SYSTEM;
    }
 
-   mTransfer = TransferFactory::createInstance(mLogger,
-                                               mPattern,
+   mTransfer = TransferFactory::createInstance(mPattern,
                                                mFd,
                                                mBuffer, 
                                                mMaxBufferSize, 
@@ -135,7 +134,8 @@ int ReadJob::runTransfers(capacity_t numTransfers, bool continueAfterError)
 
    this->setTransferStartTime();
    mBytesTransferred = 0;
-   mNumTransfersWithDataIntegrityErrors =0;
+   mNumTransfersWithDataIntegrityErrors = 0;
+   mLastErrorMsg = "";
    int exitCode = EXIT_OK;
    for (capacity_t i = 0LLU; i < numTransfers; i++)
    {
@@ -163,6 +163,8 @@ int ReadJob::runTransfers(capacity_t numTransfers, bool continueAfterError)
          exitCode = EXIT_ERROR_DATA_INTEGRITY;
          if (continueAfterError)
          {
+            mLogger.logNote(mLastErrorMsg.c_str());
+            mLastErrorMsg = "";
             mNumTransfersWithDataIntegrityErrors++;
          }
          else

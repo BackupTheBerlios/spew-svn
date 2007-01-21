@@ -35,8 +35,7 @@ using namespace std;
 #include "ZerosTransfer.h"
 
 ///////////////////  TransferFactory::createInstance()  ///////////////////////
-Transfer *TransferFactory::createInstance(Log &logger,
-                                          Job::pattern_t pattern,
+Transfer *TransferFactory::createInstance(Job::pattern_t pattern,
                                           int fd, 
                                           unsigned char *buffer, 
                                           capacity_t maxBufferSize,
@@ -47,29 +46,25 @@ Transfer *TransferFactory::createInstance(Log &logger,
    switch (pattern)
    {
    case Job::PATTERN_NONE:
-      transferPtr = new GarbageTransfer(logger,
-                                        fd, 
+      transferPtr = new GarbageTransfer(fd, 
                                         buffer, 
                                         maxBufferSize, 
                                         id);
       break;
    case Job::PATTERN_ZEROS:
-      transferPtr = new ZerosTransfer(logger,
-                                      fd, 
+      transferPtr = new ZerosTransfer(fd, 
                                       buffer, 
                                       maxBufferSize, 
                                       id);
       break;
    case Job::PATTERN_TRANSFER_NUMBERS:
-      transferPtr = new NumbersTransfer(logger,
-                                        fd, 
+      transferPtr = new NumbersTransfer(fd, 
                                         buffer, 
                                         maxBufferSize, 
                                         id);
       break;
    case Job::PATTERN_RANDOM:
-      transferPtr = new RandomTransfer(logger,
-                                       fd, 
+      transferPtr = new RandomTransfer(fd, 
                                        buffer, 
                                        maxBufferSize, 
                                        id, 

@@ -34,13 +34,12 @@ using namespace std;
 #include "RandomTransfer.h"
 
 //////////////////////////  RandomTransfer::RandomTransfer()  /////////////////
-RandomTransfer::RandomTransfer(Log &logger,
-                               int fd, 
+RandomTransfer::RandomTransfer(int fd, 
                                unsigned char *buffer, 
                                capacity_t bufferSize,
                                capacity_t id,
                                u32_t seed) : 
-   Transfer(logger, fd, buffer, bufferSize, id)
+   Transfer(fd, buffer, bufferSize, id)
 {
    mRnd.setSeed(seed);
 }

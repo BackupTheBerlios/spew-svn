@@ -26,7 +26,6 @@
 #include <string>
 
 #include "common.h"
-#include "Log.h"
 #include "TransferInfo.h"
 
 
@@ -52,8 +51,7 @@ protected:
    };
 
 public:
-   Transfer(Log &logger,
-            int fd, 
+   Transfer(int fd, 
             unsigned char *buffer, 
             capacity_t maxBufferSize,
             capacity_t id);
@@ -72,7 +70,6 @@ private:
    Transfer(const Transfer&); // Hide copy constructor.
 
 protected:
-   Log &mLogger;
    int mFd;
    unsigned char *mBuffer;
    capacity_t mMaxBufferSize;

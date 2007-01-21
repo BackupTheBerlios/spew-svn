@@ -34,12 +34,11 @@ using namespace std;
 #include "GarbageTransfer.h"
 
 //////////////////////////  GarbageTransfer::GarbageTransfer()  ///////////////
-GarbageTransfer::GarbageTransfer(Log &logger,
-                                 int fd, 
+GarbageTransfer::GarbageTransfer(int fd, 
                                  unsigned char *buffer, 
                                  capacity_t bufferSize,
                                  capacity_t id) : 
-   Transfer(logger, fd, buffer, bufferSize, id)
+   Transfer(fd, buffer, bufferSize, id)
 {
 }
 

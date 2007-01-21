@@ -34,12 +34,11 @@ using namespace std;
 #include "ZerosTransfer.h"
 
 //////////////////////////  ZerosTransfer::ZerosTransfer()  ///////////////////
-ZerosTransfer::ZerosTransfer(Log &logger,
-                             int fd, 
+ZerosTransfer::ZerosTransfer(int fd, 
                              unsigned char *buffer, 
                              capacity_t bufferSize,
                              pid_t pid) : 
-   Transfer(logger, fd, buffer, bufferSize, pid)
+   Transfer(fd, buffer, bufferSize, pid)
 {
    // Zero out buffer.  This buffer will not change during writes. 
    memset(mBuffer, 0, mMaxBufferSize);

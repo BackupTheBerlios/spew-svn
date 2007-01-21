@@ -27,7 +27,6 @@
 
 #include "common.h"
 #include "Job.h"
-#include "Log.h"
 #include "Transfer.h"
 #include "Random.h"
 
@@ -35,8 +34,7 @@
 class RandomTransfer: public Transfer
 {
 public:
-   RandomTransfer(Log &logger,
-                  int fd, 
+   RandomTransfer(int fd, 
                   unsigned char *buffer, 
                   capacity_t bufferSize,
                   capacity_t id,
