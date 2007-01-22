@@ -34,7 +34,7 @@ class Transfer
 public:
    static const capacity_t BUFFER_SIZE_INCREMENT = 512LLU;
    static const capacity_t OFFSET_INCREMENT = BUFFER_SIZE_INCREMENT;
-#ifdef __linux
+#ifdef HAVE_DIRECT_IO
    static const capacity_t DIRECTIO_BUFFER_SIZE_INCREMENT = 1024LLU;
 #endif
 
