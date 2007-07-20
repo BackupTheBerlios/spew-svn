@@ -38,7 +38,7 @@ public:
                   unsigned char *buffer, 
                   capacity_t bufferSize,
                   capacity_t id,
-                  u32_t seed);
+                  u64_t seed);
              
    virtual int read(const TransferInfo &tranInfo, string &errorMsg);
    virtual int write(const TransferInfo &tranInfo, string &errorMsg);

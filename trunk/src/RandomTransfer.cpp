@@ -38,7 +38,7 @@ RandomTransfer::RandomTransfer(int fd,
                                unsigned char *buffer, 
                                capacity_t bufferSize,
                                capacity_t id,
-                               u32_t seed) : 
+                               u64_t seed) : 
    Transfer(fd, buffer, bufferSize, id)
 {
    mRnd.setSeed(seed);

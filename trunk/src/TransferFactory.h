@@ -35,6 +35,7 @@ public:
 
 public:
    static Transfer *createInstance(Job::pattern_t pattern,
+											  unsigned char userPattern,
                                    int fd, 
                                    unsigned char *buffer, 
                                    capacity_t maxBufferSize,

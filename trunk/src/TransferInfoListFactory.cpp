@@ -41,7 +41,7 @@ TransferInfoList *TransferInfoListFactory::createInstance(
       TransferInfoList::fill_method_t fillMethod,
       capacity_t offset,
       capacity_t transferSize,
-      u64_t seed)
+      u32_t seed)
 {
    if (fillMethod == TransferInfoList::RANDOM_FILL ||
        minBufferSize != maxBufferSize)

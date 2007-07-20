@@ -32,10 +32,11 @@ using namespace std;
 #include "GarbageTransfer.h"
 #include "NumbersTransfer.h"
 #include "RandomTransfer.h"
-#include "ZerosTransfer.h"
+#include "BytePatternTransfer.h"
 
 ///////////////////  TransferFactory::createInstance()  ///////////////////////
 Transfer *TransferFactory::createInstance(Job::pattern_t pattern,
+														unsigned char userPattern,
                                           int fd, 
                                           unsigned char *buffer, 
                                           capacity_t maxBufferSize,
@@ -52,10 +53,25 @@ Transfer *TransferFactory::createInstance(Job::pattern_t pattern,
                                         id);
       break;
    case Job::PATTERN_ZEROS:
-      transferPtr = new ZerosTransfer(fd, 
-                                      buffer, 
-                                      maxBufferSize, 
-                                      id);
+      transferPtr = new BytePatternTransfer(fd, 
+														  buffer, 
+														  maxBufferSize, 
+														  id,
+			                                   0x00);
+      break;
+   case Job::PATTERN_ONES:
+      transferPtr = new BytePatternTransfer(fd, 
+														  buffer, 
+														  maxBufferSize, 
+														  id,
+			                                   0xff);
+		break;
+	case Job::PATTERN_ALTERNATING:
+		transferPtr = new BytePatternTransfer(fd, 
+                                            buffer, 
+                                            maxBufferSize, 
+                                            id,
+                                            0xaa);
       break;
    case Job::PATTERN_TRANSFER_NUMBERS:
       transferPtr = new NumbersTransfer(fd, 
@@ -69,6 +85,13 @@ Transfer *TransferFactory::createInstance(Job::pattern_t pattern,
                                        maxBufferSize, 
                                        id, 
                                        seed);
+      break;
+   case Job::PATTERN_USER_DEFINED:
+      transferPtr = new BytePatternTransfer(fd, 
+                                            buffer, 
+                                            maxBufferSize, 
+                                            id,
+                                            userPattern);
       break;
    default:
       transferPtr = 0;

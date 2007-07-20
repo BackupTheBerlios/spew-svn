@@ -102,8 +102,11 @@ static const char *PATTERN_LOOKUP[] =
 {
    "none",
    "zeros",
+   "ones",
+   "alt",
    "numbers",
    "random",
+   "#",
    (char *)NULL,
 };
 
@@ -126,6 +129,7 @@ capacity_t gMinBufferSize = DEFAULT_MIN_BUFFER_SIZE;
 capacity_t gMaxBufferSize = DEFAULT_MAX_BUFFER_SIZE;
 capacity_t gOffset = 0;
 Job::pattern_t gPattern = DEFAULT_PATTERN;
+unsigned char gUserPattern = 0;
 capacity_t gTransferSize = 0;
 string gFile = "";
 bool gUseTui = false;
@@ -244,9 +248,10 @@ void help(poptContext &context)
 "                                    gibibytes(g), gigabytes(G).\n"
 "                                    tebibytes(t), or terabytes(T).\n"
 "  PATTERN                           Data pattern used when writing/reading\n"
-"                                    data. Available patterns are: none, \n"
-"                                    zeros, random, and numbers. The default\n"
-"                                    pattern is %s.\n"
+"                                    data. Available patterns are: %s, \n"
+"                                    %s, %s, %s, %s, %s, and \"%s\"\n"
+"                                    (where \"%s\" is a number between 0-255). The\n"
+"                                    default pattern is \"%s\".\n"
 "  RCFILE                            Read additional command-line options\n"
 "                                    from RCFILE.  Other options on the\n"
 "                                    command-line will override options in\n"
@@ -273,8 +278,12 @@ void help(poptContext &context)
             Transfer::OFFSET_INCREMENT,
             PATTERN_LOOKUP[Job::PATTERN_NONE],
             PATTERN_LOOKUP[Job::PATTERN_ZEROS],
+            PATTERN_LOOKUP[Job::PATTERN_ONES],
+            PATTERN_LOOKUP[Job::PATTERN_ALTERNATING],
             PATTERN_LOOKUP[Job::PATTERN_RANDOM],
             PATTERN_LOOKUP[Job::PATTERN_TRANSFER_NUMBERS],
+            PATTERN_LOOKUP[Job::PATTERN_USER_DEFINED],
+				PATTERN_LOOKUP[Job::PATTERN_USER_DEFINED],
             PATTERN_LOOKUP[DEFAULT_PATTERN]);
    fprintf(stdout, outStr);
 
@@ -705,9 +714,25 @@ bool parse_options(int argc, const char **argv, string& cmdArgs)
             break;
          }
       }
+		if (!found) // Check for user pattern.
+		{
+			long int userPattern;
+			char *endPtr;
+			errno = 0;
+			userPattern = strtol(patternArgStr, &endPtr, 0);
+			if (errno == 0 && 
+				 *endPtr == '\0' && 
+				 userPattern >= 0 && 
+				 userPattern <= 255)
+			{
+				found = true;
+				gPattern = Job::PATTERN_USER_DEFINED;
+				gUserPattern = (unsigned char)userPattern;
+			}
+		}
       if (!found)
       {
-         error_msg("\"%s\" is not a valid pattern. Use none, zeros, numbers, or random.\n", patternArgStr);
+         error_msg("\"%s\" is not a valid pattern. Use none, zeros, ones, alt, numbers, random or # (where # is any number between 0-255).\n", patternArgStr);
          usage(context);
          poptFreeContext(context);
          return false;
@@ -1348,6 +1373,7 @@ void run(operation_enum operation)
                                  gMaxBufferSize,
                                  TransferInfoList::GEOMETRIC_PROGRESSION,
                                  gPattern,
+											gUserPattern,
                                  gFillMethod,
                                  gIOMethod,
                                  gSeed,
@@ -1386,6 +1412,7 @@ void run(operation_enum operation)
                                 gMaxBufferSize,
                                 TransferInfoList::GEOMETRIC_PROGRESSION,
                                 gPattern,
+										  gUserPattern,
                                 gFillMethod,
                                 gIOMethod,
                                 gSeed,
