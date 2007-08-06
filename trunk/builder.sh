@@ -12,6 +12,7 @@ where <arch> is one of:
    linux-parisc64
    cygwinnt-ia32
    hpux11-parisc64
+   hpux11-ia64
 
 EOF
     exit 1
@@ -21,6 +22,7 @@ arch=$1
 cxxflags=""
 ldflags=""
 configopts=--enable-static-link
+cxx=gcc
 MAKE=make
 TAR=tar
 TAR_FLAGS=-czf
@@ -46,8 +48,15 @@ case $arch in
       ldflags="-L/home/andrew/popt-1.7/.libs -lpthread" 
       cxxflags="-I/home/andrew/popt-1.7 -I/usr/local/include/ncurses"
       ;;
+     hpux11-ia64)
+     cxx=aCC
+     MAKE=gmake
+     TAR=/usr/local/bin/tar
+     ldflags="-L /usr/local/lib/hpux32 -lgettextlib -lpthread"
+     cxxflags="-AA -I/usr/local/include -I/usr/local/include/ncurses"
+     ;;
     *)
-      echo "error: unknown architecture -- use one of linux-ia32, linux-ia64, linux-parisc, winnt, hpux11" >&2
+      echo "error: unknown architecture -- use one of linux-ia32, linux-ia64, linux-parisc, winnt, hpux11-parisc64, or hpux11-ia64" >&2
       exit 1
       ;;
 esac
@@ -71,7 +80,7 @@ if [ -f  Makefile ]
 then
   ${MAKE} distclean
 fi
-LIBS="$libs" CXXFLAGS="$cxxflags" LDFLAGS="$ldflags" ./configure $configopts
+LIBS="$libs" CXX=${cxx} CXXFLAGS="$cxxflags" LDFLAGS="$ldflags" ./configure $configopts
 ${MAKE} clean all
 ${MAKE} install prefix=${installdir}
 ( cd ${builddir} && ${TAR} ${TAR_FLAGS} ${topdir}/${distname}.${TAR_EXT} . )
