@@ -122,7 +122,7 @@ Job::io_method_t gIOMethod = DEFAULT_IO_METHOD;
 TransferInfoList::fill_method_t gFillMethod = DEFAULT_FILL_METHOD;
 Units_t gUnits = DEFAULT_UNITS;
 bool gProgress = false;
-unsigned int gIterationsToDo = 1;
+int gIterationsToDo = 1;
 int gContinueAfterError = 0;
 u32_t gSeed = 0;
 capacity_t gMinBufferSize = DEFAULT_MIN_BUFFER_SIZE;
@@ -487,7 +487,7 @@ bool read_rcfiles(int argc, const char **argv, string& cmdArgs)
       rcFilePath = "";
       if (strncmp(argv[i], "--rcfile", 8) == 0)
       {
-         char *eqPos = strrchr(argv[i], '=');
+         const char *eqPos = strrchr(argv[i], '=');
          if (eqPos == (char *)NULL)
          {
             if (i + 1 < argc)
@@ -775,7 +775,7 @@ bool parse_options(int argc, const char **argv, string& cmdArgs)
 
    // Iterations.
    if (iterationsArg >= 0)
-      gIterationsToDo = (unsigned int)iterationsArg;
+      gIterationsToDo = iterationsArg;
 
    // Seed.
    if (seedArg >= 0)
