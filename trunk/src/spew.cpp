@@ -194,7 +194,7 @@ void note(char *fmt, ...)
 void version()
 {
    note("%s %s\n", CANONICAL_PROG_NAME, PROG_VERSION);
-   note("Copyright 2004 Hewlett-Packard Corp.\n");
+   note("Copyright 2007 Hewlett-Packard Corp.\n");
    note("Written by Andrew Patterson <andrew.patterson@hp.com>\n");
 }
 
