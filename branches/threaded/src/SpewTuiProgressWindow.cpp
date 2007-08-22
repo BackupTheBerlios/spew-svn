@@ -77,6 +77,17 @@ int SpewTuiProgressWindow::show()
 {
    SpewTuiWindow::show();
 
+	const vector<SpewProgressRow> &progRows = this->mSpewTui->getProgressRows();
+	unsigned int oldRows = progRows.size();
+
+	if (oldRows)
+	{
+		for (unsigned int i = 0; i < oldRows - 1; i++)
+		{
+			mvwprintw(mWindow, i, 0, "%u:%u, %d:%d", mWindowStartY, mWindowStartX, oldRows, i);
+		}
+	}
+
    this->refresh();
    return 0;
 }

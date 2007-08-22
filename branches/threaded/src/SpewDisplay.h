@@ -54,6 +54,8 @@ public:
 
    virtual unsigned int getCurrentProgressRows() const = 0;
    virtual unsigned int getCurrentProgressColumns() const = 0;
+
+	const vector<SpewProgressRow> &getProgressRows() const { return mProgressRows; };
    bool isStartOfProgressRow() const;
    bool isEndOfProgressRow(capacity_t numTrans) const;
    
