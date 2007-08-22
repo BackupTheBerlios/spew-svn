@@ -143,6 +143,19 @@ owe("403 2808 3076 3617 898 1222 2741 3761 3615 898 1222 4 3590 1222 898 4543 17
             <tbody>
 
               <tr>
+                <td style="vertical-align: top;">21-Aug-07</td>
+                <td style="vertical-align: top;">Spew 1.0.6 released.<br>
+		Minor bug fixes.<br>
+                Joe Eiler contributed a patch that adds new patterns
+                -- ones, zeros, alt, and user defined. These patterns
+                are all variations of the zeros pattern, but instead
+                0's, 1's, 0xaa's, or any number between 0 and 255 are
+                used in the buffer.<br>
+		Ported to IA-64 HPUX 11.
+		</td>
+              </tr>
+
+              <tr>
                 <td style="vertical-align: top;">20-Sep-05</td>
                 <td style="vertical-align: top;">Spew 1.0.5 released.<br>
 		Fixed bugs in read IOPS and intermediate (--progress) statistics.
@@ -198,6 +211,21 @@ owe("403 2808 3076 3617 898 1222 2741 3761 3615 898 1222 4 3590 1222 898 4543 17
           <table style="text-align: left; width: 100%;" border="0"
           cellpadding="2" cellspacing="10">
             <tbody>
+              <tr>
+                <td style="vertical-align: top;"><a href=
+                "ftp://ftp.berlios.de/pub/spew/1.0.6/index.html">spew-1.0.6</a><br>
+                </td>
+
+                <td style="vertical-align: top;">Minor bug fixes.<br>
+                Joe Eiler contributed a patch that adds new patterns
+                -- ones, zeros, alt, and user defined. These patterns
+                are all variations of the zeros pattern, but instead
+                0's, 1's, 0xaa's, or any number between 0 and 255 are
+                used in the buffer.<br>
+		Ported to IA-64 HPUX 11.
+                <td style="vertical-align: top;">stable<br></td>
+              </tr>
+
               <tr>
                 <td style="vertical-align: top;"><a href=
                 "ftp://ftp.berlios.de/pub/spew/1.0.5/index.html">spew-1.0.5</a><br>
@@ -279,10 +307,18 @@ owe("403 2808 3076 3617 898 1222 2741 3761 3615 898 1222 4 3590 1222 898 4543 17
               </tr>
               <tr>
                 <td style="vertical-align: top;"><a href=
-                "http://svn.berlios.de/viewcvs/spew/tags/1.0.5/">1.0.5</a><br>
+                "http://svn.berlios.de/viewcvs/spew/tags/1.0.6/">1.0.6</a><br>
                 </td>
                 </td>
 		  <td style="vertical-align: top;">Latest release</a><br>
+                </td>
+              </tr>
+              <tr>
+                <td style="vertical-align: top;"><a href=
+                "http://svn.berlios.de/viewcvs/spew/tags/1.0.5/">1.0.5</a><br>
+                </td>
+                </td>
+		  <td style="vertical-align: top;">Obsolete</a><br>
                 </td>
               </tr>
               <tr>
@@ -497,7 +533,7 @@ megabytes(M), gibibytes(g), gigabytes(G). tebibytes(t), or
 terabytes(T).</dd>
 <dt>PATTERN</dt>
 <dd>Data pattern used when writing/reading data. Available patterns
-are: none, zeros, random, and numbers. The default pattern is
+are: none, zeros, ones, alt, random, numbers, and "#" (where "#" is a number between 0-255). The default pattern is
 none.</dd>
 <dt>RCFILE</dt>
 <dd>Read additional command-line options from RCFILE. Other options
@@ -718,7 +754,7 @@ $HOME/.spewrc or $SPEWRC.</dd>
   <br>
   <!-- Created: Wed Aug 18 15:57:26 MDT 2004 -->
   <!-- hhmts start -->
-Last modified: Fri Jan 12 16:38:54 MST 2007
+Last modified: Tue Aug 21 21:56:27 MDT 2007
 <!-- hhmts end -->
   <br>
   <br>
