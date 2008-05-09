@@ -283,7 +283,7 @@ void help(poptContext &context)
             PATTERN_LOOKUP[Job::PATTERN_RANDOM],
             PATTERN_LOOKUP[Job::PATTERN_TRANSFER_NUMBERS],
             PATTERN_LOOKUP[Job::PATTERN_USER_DEFINED],
-				PATTERN_LOOKUP[Job::PATTERN_USER_DEFINED],
+            PATTERN_LOOKUP[Job::PATTERN_USER_DEFINED],
             PATTERN_LOOKUP[DEFAULT_PATTERN]);
    fprintf(stdout, outStr);
 
@@ -714,22 +714,22 @@ bool parse_options(int argc, const char **argv, string& cmdArgs)
             break;
          }
       }
-		if (!found) // Check for user pattern.
-		{
-			long int userPattern;
-			char *endPtr;
-			errno = 0;
-			userPattern = strtol(patternArgStr, &endPtr, 0);
-			if (errno == 0 && 
-				 *endPtr == '\0' && 
-				 userPattern >= 0 && 
-				 userPattern <= 255)
-			{
-				found = true;
-				gPattern = Job::PATTERN_USER_DEFINED;
-				gUserPattern = (unsigned char)userPattern;
-			}
-		}
+      if (!found) // Check for user pattern.
+      {
+         long int userPattern;
+         char *endPtr;
+         errno = 0;
+         userPattern = strtol(patternArgStr, &endPtr, 0);
+         if (errno == 0 && 
+             *endPtr == '\0' && 
+             userPattern >= 0 && 
+             userPattern <= 255)
+         {
+            found = true;
+            gPattern = Job::PATTERN_USER_DEFINED;
+            gUserPattern = (unsigned char)userPattern;
+         }
+      }
       if (!found)
       {
          error_msg("\"%s\" is not a valid pattern. Use none, zeros, ones, alt, numbers, random or # (where # is any number between 0-255).\n", patternArgStr);
@@ -1040,8 +1040,11 @@ void cumulative_statistics(const Job *job,
 {
    TimeHack now(TimeHack::getCurrentTime());
    TimeHack jobTransferTime(job->getJobEndTime() - job->getJobStartTime());
+
+
    gDisplay->cumulativeStatistics(job->getJobBytesTransferred(), 
                                   jobTransferTime.getTime(),
+                                  job->getTotalNumberOfTransfers(),
                                   gTotalBytesRead,
                                   gTotalReadTransferTime.getTime(),
                                   gTotalReadOps,
@@ -1373,7 +1376,7 @@ void run(operation_enum operation)
                                  gMaxBufferSize,
                                  TransferInfoList::GEOMETRIC_PROGRESSION,
                                  gPattern,
-											gUserPattern,
+                                 gUserPattern,
                                  gFillMethod,
                                  gIOMethod,
                                  gSeed,
@@ -1412,7 +1415,7 @@ void run(operation_enum operation)
                                 gMaxBufferSize,
                                 TransferInfoList::GEOMETRIC_PROGRESSION,
                                 gPattern,
-										  gUserPattern,
+                                gUserPattern,
                                 gFillMethod,
                                 gIOMethod,
                                 gSeed,
