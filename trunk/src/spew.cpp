@@ -151,13 +151,13 @@ unsigned int gFoundTransferErrors = 0;
 //////////////////////////////////////////////////////////////////////////////
 ////////////////////  Function Prototypes  ///////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void error_msg(char *fmt, ...);
-void note(char *fmt, ...);
+void error_msg(const char *fmt, ...);
+void note(const char *fmt, ...);
 void usage();
 bool parse_options(int argc, const char **argv, string& cmdArgs);
 bool validate_options();
 void end_program(int exitCode);
-void end_program(int exitCode, char *fmt, ...);
+void end_program(int exitCode, const char *fmt, ...);
 void update_transfer_totals(const Job *job,
                             IoDirection_t ioDirection);
 void run_statistics(unsigned int iterations);
@@ -168,7 +168,7 @@ void run_statistics(unsigned int iterations);
 //////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////  error_msg()  ///////////////////////////////////////
-void error_msg(char *fmt, ...)
+void error_msg(const char *fmt, ...)
 {
    fprintf(stderr, "%s: ", gPrgName);
    va_list ap;
@@ -180,7 +180,7 @@ void error_msg(char *fmt, ...)
 
 
 /////////////////////////  note()  ///////////////////////////////////////////
-void note(char *fmt, ...)
+void note(const char *fmt, ...)
 {
    va_list ap;
    va_start(ap, fmt);
@@ -929,7 +929,7 @@ void end_program(int exitCode)
 
 
 //////////////////////////  end_program()  ////////////////////////////////////
-void end_program(int exitCode, char *fmt, ...)
+void end_program(int exitCode, const char *fmt, ...)
 {
    char msg[MAX_TMP_STR_LEN];
 

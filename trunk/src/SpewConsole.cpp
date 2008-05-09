@@ -27,6 +27,8 @@ namespace std {} using namespace std;
 #endif
 
 #include <stdio.h>
+#include <cstring>
+
 #include "common.h"
 #include "SpewConsole.h"
 
