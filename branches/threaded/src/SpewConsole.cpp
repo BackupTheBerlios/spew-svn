@@ -27,6 +27,8 @@ using namespace std;
 #endif
 
 #include <stdio.h>
+#include <string.h>
+
 #include "common.h"
 #include "SpewConsole.h"
 #include "TimeHack.h"

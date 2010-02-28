@@ -30,6 +30,8 @@ using namespace std;
 #include <config.h>
 #endif
 
+#include <string.h>
+
 #include "common.h"
 #include "SpewTuiWindow.h"
 #include "SpewTuiHelpWindow.h"

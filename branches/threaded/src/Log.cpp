@@ -27,6 +27,7 @@ using namespace std;
 #endif
 
 #include <stdio.h>
+#include <string.h>
 #include <stdarg.h>
 #include <errno.h>
 #include <signal.h>
@@ -38,9 +39,9 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 ////////////////////////  Local constants  ////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-int TIMESTAMP_STR_LEN = 19;  // Does not includes space for \0.
-char LOGFILE_SEPARATOR_CHAR = '#';
-int LOGFILE_WIDTH = 80;
+static const int TIMESTAMP_STR_LEN = 19;  // Does not includes space for \0.
+static const char LOGFILE_SEPARATOR_CHAR = '#';
+static const int LOGFILE_WIDTH = 80;
 
 #ifdef USE_THREADS
 //////////////////////////  Log::threadEntryPoint()  //////////////////////////

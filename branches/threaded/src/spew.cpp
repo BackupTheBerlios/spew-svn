@@ -142,13 +142,13 @@ unsigned int gFoundTransferErrors = 0;
 //////////////////////////////////////////////////////////////////////////////
 ////////////////////  Function Prototypes  ///////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
-void error_msg(char *fmt, ...);
-void note(char *fmt, ...);
+void error_msg(const char *fmt, ...);
+void note(const char *fmt, ...);
 void usage();
 bool parse_options(int argc, const char **argv, string& cmdArgs);
 bool validate_options();
 void end_program(int exitCode);
-void end_program(int exitCode, char *fmt, ...);
+void end_program(int exitCode, const char *fmt, ...);
 void cumulative_statistics(const Job *job, 
                            const CumulativeStatistics *cumStats);
 void end_statistics(const CumulativeStatistics *cumStats);
@@ -166,7 +166,7 @@ void run_jobs(operation_enum operation, CumulativeStatistics *cumStats);
 //////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////  error_msg()  ///////////////////////////////////////
-void error_msg(char *fmt, ...)
+void error_msg(const char *fmt, ...)
 {
    fprintf(stderr, "%s: ", gPrgName);
    va_list ap;
@@ -178,7 +178,7 @@ void error_msg(char *fmt, ...)
 
 
 /////////////////////////  note()  ///////////////////////////////////////////
-void note(char *fmt, ...)
+void note(const char *fmt, ...)
 {
    va_list ap;
    va_start(ap, fmt);
@@ -277,7 +277,7 @@ void help(poptContext &context)
             PATTERN_LOOKUP[Job::PATTERN_RANDOM],
             PATTERN_LOOKUP[Job::PATTERN_TRANSFER_NUMBERS],
             PATTERN_LOOKUP[DEFAULT_PATTERN]);
-   fprintf(stdout, outStr);
+   fprintf(stdout, "%s", outStr);
 
    fprintf(stdout, "\nReport bugs to Andrew Patterson <andrew.patterson@hp.com>.\n");
 }
@@ -479,7 +479,7 @@ bool read_rcfiles(int argc, const char **argv, string& cmdArgs)
       rcFilePath = "";
       if (strncmp(argv[i], "--rcfile", 8) == 0)
       {
-         char *eqPos = strrchr(argv[i], '=');
+         const char *eqPos = strrchr(argv[i], '=');
          if (eqPos == (char *)NULL)
          {
             if (i + 1 < argc)
@@ -900,7 +900,7 @@ void end_program(int exitCode)
 
 
 //////////////////////////  end_program()  ////////////////////////////////////
-void end_program(int exitCode, char *fmt, ...)
+void end_program(int exitCode, const char *fmt, ...)
 {
    int rtn;
    char msg[MAX_TMP_STR_LEN];

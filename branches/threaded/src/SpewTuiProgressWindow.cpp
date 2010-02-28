@@ -23,6 +23,7 @@
 using namespace std;
 
 #include <stdio.h>
+#include <string.h>
 #include <stdarg.h>
 #include <ncurses.h>
 

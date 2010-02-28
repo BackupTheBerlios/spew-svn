@@ -27,6 +27,7 @@ using namespace std;
 #endif
 
 #include <stdio.h>
+#include <string.h>
 #include <stdarg.h>
 #include <unistd.h>
 #include <math.h>
@@ -70,8 +71,8 @@ static const size_t MAX_SPRINTF_CHARS = 2048;
 static const size_t MAX_STR_CHARS = 1024;
 
 
-/////////////////////////  basename()  ///////////////////////////////////////
-const char *basename(char *path)
+/////////////////////////  base_name()  ///////////////////////////////////////
+const char *base_name(char *path)
 {
    char *name = strrchr(path, '/');
    if (name == NULL)
