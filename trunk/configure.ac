@@ -83,7 +83,7 @@ fi
 AC_FUNC_MALLOC
 AC_TYPE_SIGNAL
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([getpagesize gettimeofday memset strerror strsignal strrchr localtime_r])
+AC_CHECK_FUNCS([getpagesize gettimeofday memset strerror strsignal strrchr localtime_r basename])
 
 # Add --enable-static
 AC_ARG_ENABLE(static-link,
